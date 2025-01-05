@@ -108,9 +108,9 @@ The `categories` table includes three independent fields:
 
 
 | <center>Field</center> | <center>Type</center> | <center>Description</center>                                                                                                      |
-| ---------------------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| **`id`**               | **INT**               | **PK**, 64-bit integer, restricted (but not enforced) to a subset, where each byte is an ASCII code of an alphanumeric character. |
-| **`name`**             | **TEXT**              | Category name, declared as case-insensitive, prohibited characters include colon, comma, double quote, slashes, TAB, CR, LF.      |
+| ---------------------- | :-------------------: | --------------------------------------------------------------------------------------------------------------------------------- |
+| **`id`**               |        **INT**        | **PK**, 64-bit integer, restricted (but not enforced) to a subset, where each byte is an ASCII code of an alphanumeric character. |
+| **`name`**             |       **TEXT**        | Category name, declared as case-insensitive, prohibited characters include colon, comma, double quote, slashes, TAB, CR, LF.      |
 
 
 ## Items table
