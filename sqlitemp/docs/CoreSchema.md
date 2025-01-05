@@ -106,6 +106,12 @@ The `categories` table includes three independent fields:
 - **`ascii_id` (TEXT, GENERATED)**: ASCII representation of the `id` field. To further reduce the probability of collision, this field is declared as case-sensitive.
 - **`path` (TEXT, GENERATED)**: Constructed from `parent_path` and `name`.
 
+
+| <center>Field</center>    | <center>Attributes</center> | <center>Description</center>                                                                                              |
+| -------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **`id`** | **INTEGER, PK**             | 64-bit integer, restricted (but not enforced) to a subset, where each byte is an ASCII code of an alphanumeric character. |
+
+
 ## Items table
 
 The `items` table includes four independent fields:
