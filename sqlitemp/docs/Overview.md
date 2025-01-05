@@ -6,11 +6,10 @@ Each category's absolute path serves as a unique identifier, ensuring that no tw
 
 Item names are also case-insensitive yet case-preserving but do not form unique identifiers. While having multiple items with identical names assigned to the same category is generally discouraged, uniqueness of sibling item names is not enforced. Items can be assigned to multiple categories, and this many-to-many relationship is stored in a conventional database association table.
 
-[**Next: The Core Schema -\>**][CoreSchema]
+---
 
-
-|     | [**Next: The Core Schema ->**][CoreSchema] |
-| --- | ------------------------------------------ |
+| [**Next: The Core Schema ->**][CoreSchema] |
+| ------------------------------------------ |
 
 
 <!-- References -->
