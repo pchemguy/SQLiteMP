@@ -8,11 +8,17 @@ Item names are also case-insensitive yet case-preserving but do not form unique 
 
 [**Next: The Core Schema -\>**][CoreSchema]
 
+
+|     | [**Next: The Core Schema -\>**][CoreSchema] |
+| --- | ------------------------------------------- |
+
+
+
 <table style="width: 100%; border-spacing: 0; border-collapse: collapse;">
   <tbody style="width: 100%">
     <tr style="width: 100%;">
       <td style="text-align: left; width: 50%;">Left Aligned Text</td>
-      <td style="text-align: right; width: 50%;">Right Aligned Text</td>
+      <td style="text-align: right; width: 50%;">[**Next: The Core Schema -\>**][CoreSchema]</td>
     </tr>
   </tbody>
 </table>
