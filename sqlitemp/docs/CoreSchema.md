@@ -124,10 +124,11 @@ The two fields from table primary key. It is set to REPLACE rows on conflict. Co
 
 ---  
 
-| [**<- Previous: The Core Schema**][CoreSchema] | [**Next: The Core Schema ->**][CoreSchema] |
-| ---------------------------------------------- | ------------------------------------------ |
+| [**<- Previous: Overview**][Overview] | [**Next: The Core Schema ->**][CoreSchema] |
+| ------------------------------------- | ------------------------------------------ |
 
 
 <!-- References-->
 
 [CoreSchema]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/src/sqlitemp/sql/core_schema.sql
+[Overview]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Overview.md
