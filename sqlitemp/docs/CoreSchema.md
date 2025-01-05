@@ -107,10 +107,11 @@ The `categories` table includes three independent fields:
 - **`path` (TEXT, GENERATED)**: Constructed from `parent_path` and `name`.
 
 
-| <center>Field</center> | <center>Type</center> | <center>Description</center>                                                                                                      |
-| ---------------------- | :-------------------: | --------------------------------------------------------------------------------------------------------------------------------- |
-| **`id`**               |        **INT**        | **PK**, 64-bit integer, restricted (but not enforced) to a subset, where each byte is an ASCII code of an alphanumeric character. |
-| **`name`**             |       **TEXT**        | Category name, declared as case-insensitive, prohibited characters include colon, comma, double quote, slashes, TAB, CR, LF.      |
+| <center>Field</center> | <center>Type</center> | <center>Description</center>                                                                                                                                                                                                                                                                                               |
+| ---------------------- | :-------------------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`id`**               |        **INT**        | **PRIMARY KEY**, 64-bit integer, restricted (but not enforced) to a subset, where each byte is an ASCII code of an alphanumeric character.                                                                                                                                                                                 |
+| **`name`**             |       **TEXT**        | Case-insensitive category name, prohibited characters include colon, comma, double quote, slashes, TAB, CR, LF.                                                                                                                                                                                                            |
+| **`parent_path`**      |       **TEXT**        | Forward-slash-sepated path not including the name of the category. `parent_path` includes leading, but not trailing '/' and is set to NULL for top-level categories. `parent_path` references the generated `path` field with propagation on both update and delete operations, constructed from `parent_path` and `name`. |
 
 
 ## Items table
