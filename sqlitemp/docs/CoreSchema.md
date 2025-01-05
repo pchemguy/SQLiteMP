@@ -122,6 +122,10 @@ The minimalistic `items_categories` table includes two fields:
 - **`item_handle` (TEXT)**: Item handle.
 The two fields from table primary key. It is set to REPLACE rows on conflict. Conflicts may occur during bulk UPDATE or INSERT operations. For the INSERT operation the IGNORE resolution will work equally well. However, in case of the UPDATE operation, the IGNORE resolution would incorrectly keep the old association in the table.
 
+---  
+
+| [**<- Previous: The Core Schema**][CoreSchema] | [**Next: The Core Schema ->**][CoreSchema] |
+| ---------------------------------------------- | ------------------------------------------ |
 
 
 <!-- References-->
