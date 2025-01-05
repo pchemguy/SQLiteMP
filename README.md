@@ -7,8 +7,10 @@ The SQLiteMP project demonstrates a proof-of-concept implementation of an MP dat
 Although this project extends the GitHub-Pages-based SQLite SQL Tutorial, an important motivation for creating a separate repository was to simplify setup and maintenance by avoiding GitHub Pages. The standard GitHub file browser, with its automatic table-of-contents (TOC) support for Markdown-formatted files, offers a sufficiently user-friendly interface for documentation.
 
 
+
 <!-- References -->
 
 [SQLite SQL Tutorial]: https://pchemguy.github.io/SQLite-SQL-Tutorial
 [SQLite View]: https://sqlite.org/lang_createview.html
 [SQLite Trigger]: https://sqlite.org/lang_createtrigger.html
+[docs] 
