@@ -2,6 +2,7 @@
 
 <details>  
 <summary><b>Core schema</b></summary>  
+
 ```sql
 DROP TABLE IF EXISTS "categories";
 CREATE TABLE "categories" (
@@ -95,6 +96,7 @@ CREATE TABLE "items_categories" (
 
 CREATE INDEX idx_items_categories_item_handle ON items_categories(item_handle);
 ```
+
 </details>  
 
 
