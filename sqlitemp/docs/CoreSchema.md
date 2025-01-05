@@ -1,5 +1,34 @@
 # Core schema
 
+## Categories table
+
+| <center>Field</center> | <center>Attributes</center> | <center>Description</center>                                                                                                                                                                                                                                                                                               |
+| ---------------------- | :-------------------------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`id`**               |    **INTEGER**<br>**PK**    | 64-bit integer, restricted (but not enforced) to a subset, where each byte is an ASCII code of an alphanumeric character.                                                                                                                                                                                                  |
+| **`name`**             |          **TEXT**           | Case-insensitive category name, prohibited characters include colon, comma, double quote, slashes, TAB, CR, LF.                                                                                                                                                                                                            |
+| **`parent_path`**      |          **TEXT**           | Forward-slash-sepated path not including the name of the category. `parent_path` includes leading, but not trailing '/' and is set to NULL for top-level categories. `parent_path` references the generated `path` field with propagation on both update and delete operations, constructed from `parent_path` and `name`. |
+| **`ascii_id`**         |  **TEXT**<br>**GENERATED**  | ASCII representation of the `id` field. To further reduce the probability of collision, this field is declared as case-sensitive.                                                                                                                                                                                          |
+| **`path`**             |  **TEXT**<br>**GENERATED**  | Constructed from `parent_path` and `name`.                                                                                                                                                                                                                                                                                 |
+
+## Items table
+
+| <center>Field</center> | <center>Attributes</center> | <center>Description</center>                                                                                                      |
+| ---------------------- | :-------------------------: | --------------------------------------------------------------------------------------------------------------------------------- |
+| **`id`**               |    **INTEGER**<br>**PK**    | 64-bit integer, restricted (but not enforced) to a subset, where each byte is an ASCII code of an alphanumeric character.         |
+| **`name`**             |          **TEXT**           | Case-insensitive item name, prohibited characters include colon, comma, double quote, slashes, TAB, CR, LF.                       |
+| **`handle_type`**      |          **TEXT**           | Type of primary item identifier, such as, DOI, ISBN, URL, etc.                                                                    |
+| **`handle`**           |   **TEXT**<br>**UNIQUE**    | Case-insensitive primary item identifier, such as, DOI, ISBN, URL, etc.                                                           |
+| **`ascii_id`**         |  **TEXT**<br>**GENERATED**  | ASCII representation of the `id` field. To further reduce the probability of collision, this field is declared as case-sensitive. |
+
+## Association table
+
+| <center>Field</center> | <center>Attributes</center> | <center>Description</center> |
+| ---------------------- | :-------------------------: | ---------------------------- |
+| **`cat_path`**         |          **TEXT**           | Category path.               |
+| **`item_handle`**      |          **TEXT**           | Item handle.                 |
+
+The minimalistic `items_categories` table includes two fields forming the table primary key. The PK is set to REPLACE rows on conflict, which is a sensible strategy simplifying the SQL code for MP operations. Conflicts may occur, for example, during bulk UPDATE or INSERT operations. For the INSERT operation, the IGNORE resolution works equally well. However, in case of the UPDATE operation, the IGNORE resolution would incorrectly keep the old association in the table.
+
 <details>  
 <summary><b>Core schema</b></summary>  
 
@@ -96,35 +125,6 @@ CREATE INDEX idx_items_categories_item_handle ON items_categories(item_handle);
 ```
 
 </details>  
-
-## Categories table
-
-| <center>Field</center> | <center>Attributes</center> | <center>Description</center>                                                                                                                                                                                                                                                                                               |
-| ---------------------- | :-------------------------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`id`**               |    **INTEGER**<br>**PK**    | 64-bit integer, restricted (but not enforced) to a subset, where each byte is an ASCII code of an alphanumeric character.                                                                                                                                                                                                  |
-| **`name`**             |          **TEXT**           | Case-insensitive category name, prohibited characters include colon, comma, double quote, slashes, TAB, CR, LF.                                                                                                                                                                                                            |
-| **`parent_path`**      |          **TEXT**           | Forward-slash-sepated path not including the name of the category. `parent_path` includes leading, but not trailing '/' and is set to NULL for top-level categories. `parent_path` references the generated `path` field with propagation on both update and delete operations, constructed from `parent_path` and `name`. |
-| **`ascii_id`**         |  **TEXT**<br>**GENERATED**  | ASCII representation of the `id` field. To further reduce the probability of collision, this field is declared as case-sensitive.                                                                                                                                                                                          |
-| **`path`**             |  **TEXT**<br>**GENERATED**  | Constructed from `parent_path` and `name`.                                                                                                                                                                                                                                                                                 |
-
-## Items table
-
-| <center>Field</center> | <center>Attributes</center> | <center>Description</center>                                                                                                      |
-| ---------------------- | :-------------------------: | --------------------------------------------------------------------------------------------------------------------------------- |
-| **`id`**               |    **INTEGER**<br>**PK**    | 64-bit integer, restricted (but not enforced) to a subset, where each byte is an ASCII code of an alphanumeric character.         |
-| **`name`**             |          **TEXT**           | Case-insensitive item name, prohibited characters include colon, comma, double quote, slashes, TAB, CR, LF.                       |
-| **`handle_type`**      |          **TEXT**           | Type of primary item identifier, such as, DOI, ISBN, URL, etc.                                                                    |
-| **`handle`**           |   **TEXT**<br>**UNIQUE**    | Case-insensitive primary item identifier, such as, DOI, ISBN, URL, etc.                                                           |
-| **`ascii_id`**         |  **TEXT**<br>**GENERATED**  | ASCII representation of the `id` field. To further reduce the probability of collision, this field is declared as case-sensitive. |
-
-## Association table
-
-| <center>Field</center> | <center>Attributes</center> | <center>Description</center> |
-| ---------------------- | :-------------------------: | ---------------------------- |
-| **`cat_path`**         |          **TEXT**           | Category path.               |
-| **`item_handle`**      |          **TEXT**           | Item handle.                 |
-
-The minimalistic `items_categories` table includes two fields forming the table primary key. The PK is set to REPLACE rows on conflict, which is a sensible strategy simplifying the SQL code for MP operations. Conflicts may occur, for example, during bulk UPDATE or INSERT operations. For the INSERT operation, the IGNORE resolution works equally well. However, in case of the UPDATE operation, the IGNORE resolution would incorrectly keep the old association in the table.
 
 ---  
 
