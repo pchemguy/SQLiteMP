@@ -13,4 +13,4 @@ See [docs][] for further details.
 [SQLite SQL Tutorial]: https://pchemguy.github.io/SQLite-SQL-Tutorial
 [SQLite View]: https://sqlite.org/lang_createview.html
 [SQLite Trigger]: https://sqlite.org/lang_createtrigger.html
-[docs]: /pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Overview.md
+[docs]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Overview.md
