@@ -107,9 +107,9 @@ The `categories` table includes three independent fields:
 - **`path` (TEXT, GENERATED)**: Constructed from `parent_path` and `name`.
 
 
-| <center>Field</center>    | <center>Attributes</center> | <center>Description</center>                                                                                              |
-| -------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| **`id`** | **INTEGER, PK**             | 64-bit integer, restricted (but not enforced) to a subset, where each byte is an ASCII code of an alphanumeric character. |
+| <center>Field</center> | <center>Attributes</center> | Description                                                                                                               |
+| ---------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **`id`**               | **INTEGER, PK**             | 64-bit integer, restricted (but not enforced) to a subset, where each byte is an ASCII code of an alphanumeric character. |
 
 
 ## Items table
