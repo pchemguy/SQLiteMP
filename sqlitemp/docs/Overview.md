@@ -9,8 +9,8 @@ Item names are also case-insensitive yet case-preserving but do not form unique 
 [**Next: The Core Schema -\>**][CoreSchema]
 
 
-|     | [**Next: The Core Schema -\>**][CoreSchema] |
-| --- | -------------------------------------------:|
+|     | [**Next: The Core Schema ->**][CoreSchema] |
+| --- | ------------------------------------------ |
 
 
 
