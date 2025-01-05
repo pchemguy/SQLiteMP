@@ -97,6 +97,8 @@ CREATE INDEX idx_items_categories_item_handle ON items_categories(item_handle);
 ```
 </details>  
 
+
+
 <!-- References-->
 
 [CoreSchema]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/src/sqlitemp/sql/core_schema.sql
