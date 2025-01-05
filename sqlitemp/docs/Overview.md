@@ -12,14 +12,6 @@ Item names are also case-insensitive yet case-preserving but do not form unique 
 |     | [**Next: The Core Schema ->**][CoreSchema] |
 | --- | ------------------------------------------ |
 
-<table width=100%>
-  <tr width=100%>
-    <td style="text-align: left; width: 50%;">Left Aligned Text</td>
-    <td style="text-align: right; width: 50%;">Right Aligned Text</td>
-  </tr>
-</table>
-
-
 
 <!-- References -->
 
