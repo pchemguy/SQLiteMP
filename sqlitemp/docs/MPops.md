@@ -15,8 +15,8 @@
 - **DELETE**
     - **delete tree**: Given a set of categories, delete the associated subtrees and related item associations (a partial equivalent of the file system directory **delete** operation, see notes below).
     - **remove specific associations**: Given a category and a set of associated items, remove items from the category (a partial equivalent of the file system file symbolic link **delete** operation, see notes below).
-    - **remove all associations**: Given a set of items, remove all associated categories.
-    - **delete items**: Given a a set of items, delete them (a partial equivalent of the file system file **delete** operation, see notes below).
+    - **remove all associations**: Given a set of items, remove all related category associations.
+    - **delete items**: Given a a set of items, delete them.
 - **EXPORT**
     - **categories**
     - **items**
@@ -37,4 +37,6 @@ Items are somewhat different. The user is usually in control of category names. 
 
 Move/copy tree operations update the `categories` table, but never touch items directly. Instead, these operations, when necessary, update the association table. Because present implementation of the `items_categories` association table uses category path (`cat_path`) for defining associations, the association records are always updated during move/copy tree operations. When a category subtree is moved and no name clashing occurs, `name` and `parent_path` of all affected categories are updated, and the associated `items_categories` records are updated automatically thanks to the generated field `path` and cascaded foreign key operations. When some category names clash as a result of the move operation, the conflicting categories being moved are deleted, but related item associations are updated producing a result similar to merged directories. A directory move operation may overwrite destination files in case of clashing file names. Because item names cannot clash, the only potential collision is when the categories being merged are assigned the same item. In such a case, the effect of the move operation for clashing associations is removal of the association records for categories being moved. `ON CONFLICT REPLACE` resolution (the primary key of the `items_categories` tables) enables automatic correct processing of clashing association. Similarly, the copy operation creates new item associations, but not new items. For clashing association, the copy operation is simply a no-op.
 
-# Delete tree
+## Delete tree
+
+This project adopts the convention of never deleting items implicitly, such as in the case of subtree deletion. When a category subtree is deleted, only related item associations are removed. Items are only deleted when target item handles are explicitly provided to the "delete items" operation.
