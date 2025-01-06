@@ -2,7 +2,7 @@
 
 ## Retrieve Descendant Categories
 
-Let's start with a basic example
+Let's start with a basic example that retrieves the list of descendant categories for a given set of nodes:
 
 ```sql
 -- Retrieves descendant categories
@@ -26,15 +26,32 @@ WITH
         FROM categories, base_ops
         WHERE categories.path || '/' LIKE base_ops.path || '/%'
     )
-SELECT id, name, parent_path, ascii_id, path FROM nodes
+SELECT * FROM nodes
 ORDER BY path;
 ```
 
-The code above retrieves the list of descendant categories for a given set of nodes. The first CTE `json_ops` defines a table:
+The first CTE `json_ops` defines a table:
 
-| op_name     | json_op |
-| ----------- | ------- |
-| ls_cat_desc | {data}  |
+| op_name     | json_op     |
+| ----------- | ----------- |
+| ls_cat_desc | `{payload}` |
+where `{payload}` is a JSON-formatted string:
+
+```json
+[
+    "/Assets/Diagrams",
+    "/Library/Drafts/DllTools/Dem - DLL/memtools",
+    "/Project/SQLiteDBdev"
+]
+```
+
+The second CTE `base_ops` unpacks the JSON object into a table:
+
+| <center>opid</center> | <center>path</center>                       |
+| :-------------------: | ------------------------------------------- |
+|           1           | /Assets/Diagrams                            |
+|           2           | /Library/Drafts/DllTools/Dem - DLL/memtools |
+|           3           | /Project/SQLiteDBdev                        |
 
 
 ---
