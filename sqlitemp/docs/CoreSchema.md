@@ -32,7 +32,7 @@ The minimalistic `items_categories` table includes two fields forming the table 
 
 ## SQL
 
-See the SQL code of the core schema below (and also in the [file][CoreSchema]):
+See the SQL code of the core schema below (and also in the [file][CoreSchema]; [core dummy data][]):
 
 <details>  
 <summary><b>Core schema</b></summary>  
