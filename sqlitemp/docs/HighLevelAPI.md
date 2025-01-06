@@ -83,7 +83,26 @@ ORDER BY path;
 
 but let us explore a different approach.
 
-## 
+## Hierarchy Operations Table
+
+
+| <center>Field</center> | <center>Attributes</center> | <center>Description</center>                                                                                                      |
+| ---------------------- | :-------------------------: | --------------------------------------------------------------------------------------------------------------------------------- |
+| **`id`**               |    **INTEGER**<br>**PK**    |                                                                                                                                   |
+| **`op_name`**          |          **TEXT**           | Name of operation.                                                                                                                |
+| **`json_op`**          |          **TEXT**           | JSON-formatted string containing operation information.                                                                           |
+| **`payload`**          |          **TEXT**           | Response data (set by triggers).                                                                                                  |
+
+```sql
+DROP TABLE IF EXISTS "hierarchy_ops";
+CREATE TABLE "hierarchy_ops" (
+    "id"        INTEGER PRIMARY KEY AUTOINCREMENT,
+    "op_name"   TEXT    NOT NULL COLLATE NOCASE,
+    "json_op"   TEXT    NOT NULL COLLATE NOCASE,
+    "payload"   TEXT
+);
+```
+
 
 ---
 
