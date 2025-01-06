@@ -128,8 +128,8 @@ CREATE INDEX idx_items_categories_item_handle ON items_categories(item_handle);
 
 ---  
 
-| [**<= Previous: Overview**][Overview] | [**Next: Materialized path operations=>**][MPops] |
-| ------------------------------------- | ------------------------------------------------- |
+| [**<= Previous: Overview**][Overview] | [**Next: Materialized path operations =>**][MPops] |
+| ------------------------------------- | -------------------------------------------------- |
 
 
 <!-- References-->

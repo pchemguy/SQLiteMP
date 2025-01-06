@@ -52,8 +52,8 @@ This project adopts the convention of never deleting items implicitly, even duri
 
 ---
 
-| [**<= Previous: The Core Schema**][CoreSchema] | [**Next: High Level API=>**][HighLevelAPI] |
-| ---------------------------------------------- | ------------------------------------------ |
+| [**<= Previous: The Core Schema**][CoreSchema] | [**Next: High Level API =>**][HighLevelAPI] |
+| ---------------------------------------------- | ------------------------------------------- |
 
 
 <!-- References -->
