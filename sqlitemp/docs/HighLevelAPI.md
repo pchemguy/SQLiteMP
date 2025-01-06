@@ -1,4 +1,4 @@
-# High Level API
+# High Level API Approach
 
 ## Retrieve Descendant Categories
 
@@ -160,7 +160,26 @@ And the result can be retrieved directly, for example:
 SELECT * FROM ls_cat_desc;
 ```
 
+Finally, let's us define a trigger:
 
+```sql
+-- Trigger to insert new paths after insert
+DROP TRIGGER IF EXISTS "ls_cat_desc";
+CREATE TRIGGER "ls_cat_desc"
+AFTER INSERT ON "hierarchy_ops"
+FOR EACH ROW
+WHEN NEW."op_name" = 'ls_cat_desc'
+BEGIN
+    UPDATE hierarchy_ops SET payload = json_data
+    FROM (
+        SELECT json_group_array(path ORDER BY path) AS json_data
+        FROM dir_cats
+    )
+	WHERE id = NEW.id;
+END;
+```
+
+The trigger code packs the set of retrieved categories into a JSON string and sets the `payload` field of the record defining the operation. 
 
 ---
 
