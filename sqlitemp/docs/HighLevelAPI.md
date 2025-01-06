@@ -35,6 +35,7 @@ The first CTE `json_ops` defines a table:
 | op_name     | json_op     |
 | ----------- | ----------- |
 | ls_cat_desc | `{payload}` |
+
 where `{payload}` is a JSON-formatted string:
 
 ```json
