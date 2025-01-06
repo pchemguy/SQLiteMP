@@ -52,7 +52,7 @@ This project adopts the convention of never deleting items implicitly, even duri
 
 ---
 
-| [**<= Previous: he Core Schema **][CoreSchema] | [**Next: Materialized path operations=>**][MPops] |
+| [**<= Previous: The Core Schema**][CoreSchema] | [**Next: Materialized path operations=>**][MPops] |
 | ---------------------------------------------- | ------------------------------------------------- |
 
 
