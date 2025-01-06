@@ -83,15 +83,16 @@ ORDER BY path;
 
 but let us explore a different approach.
 
-## Hierarchy Operations Table
+### Hierarchy Operations Table
 
+Define another table:
 
-| <center>Field</center> | <center>Attributes</center> | <center>Description</center>                                                                                                      |
-| ---------------------- | :-------------------------: | --------------------------------------------------------------------------------------------------------------------------------- |
-| **`id`**               |    **INTEGER**<br>**PK**    |                                                                                                                                   |
-| **`op_name`**          |          **TEXT**           | Name of operation.                                                                                                                |
-| **`json_op`**          |          **TEXT**           | JSON-formatted string containing operation information.                                                                           |
-| **`payload`**          |          **TEXT**           | Response data (set by triggers).                                                                                                  |
+| <center>Field</center> | <center>Attributes</center> | <center>Description</center>                            |
+| ---------------------- | :-------------------------: | ------------------------------------------------------- |
+| **`id`**               |    **INTEGER**<br>**PK**    |                                                         |
+| **`op_name`**          |          **TEXT**           | Name of operation.                                      |
+| **`json_op`**          |          **TEXT**           | JSON-formatted string containing operation information. |
+| **`payload`**          |          **TEXT**           | JSON-packed response data (set by triggers).            |
 
 ```sql
 DROP TABLE IF EXISTS "hierarchy_ops";
@@ -102,6 +103,63 @@ CREATE TABLE "hierarchy_ops" (
     "payload"   TEXT
 );
 ```
+
+This table will be used to insert materialized path operations, for example:
+
+```sql
+WITH
+    json_ops(op_name, json_op) AS (
+        VALUES
+            ('ls_cat_desc', json('[' || concat_ws(',',
+                '"/Assets/Diagrams"',
+                '"/Library/Drafts/DllTools/Dem - DLL/memtools"',
+                '"/Project/SQLiteDBdev"'
+            ) || ']'))
+    )
+INSERT INTO hierarchy_ops(op_name, json_op)
+SELECT * FROM json_ops;
+```
+
+where the contents of the `json_ops` CTE is identical to the data in the earlier query. The `op_name` = 'ls_cat_desc' value is an arbitrarily defined name of the operation that retrieves the list of descendant categories. Let's define a view:
+
+```sql
+DROP VIEW IF EXISTS "ls_cat_desc";
+CREATE VIEW "ls_cat_desc" AS
+WITH
+    json_ops AS (
+		SELECT json_op
+		FROM hierarchy_ops
+		WHERE op_name = 'ls_cat_desc'
+		ORDER BY id DESC
+		LIMIT 1
+    ),
+    base_ops AS (
+        SELECT
+            "key" + 1 AS opid,
+            value AS path
+        FROM json_ops AS jo, json_each(jo.json_op) AS terms
+    ),
+    nodes AS (
+        SELECT categories.*
+        FROM categories, base_ops
+        WHERE categories.path || '/' LIKE base_ops.path || '/%'
+    )
+SELECT * FROM nodes
+ORDER BY path;
+```
+
+This view incorporates a modified version of the earlier query. The first `json_ops` CTE now retrieves the JSON input from the `hierarchy_ops` table by looking for the last inserted row with matching `op_name` value. The rest of the code is identical to the code shown previously. To retrieve  descendant categories, the application can now use query to submit a command:
+
+```sql
+INSERT INTO hierarchy_ops(op_name, json_op) VALUES ($op_name, $json_op);
+```
+
+And the result can be retrieved directly, for example:
+
+```sql
+SELECT * FROM ls_cat_desc;
+```
+
 
 
 ---
