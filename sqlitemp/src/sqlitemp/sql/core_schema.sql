@@ -44,7 +44,6 @@ CREATE TABLE "categories" (
 -- Index for quick lookup by parent_path
 CREATE INDEX "idx_categories_parent_path" ON "categories" ("parent_path");
 
-
 DROP TABLE IF EXISTS "items";
 CREATE TABLE "items" (
                             -- Unique ID for each item, 64-bit integer
@@ -80,7 +79,6 @@ CREATE TABLE "items" (
                             )
 );
 
-
 DROP TABLE IF EXISTS "items_categories";
 CREATE TABLE "items_categories" (
     "cat_path"      TEXT COLLATE NOCASE REFERENCES categories(path) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -89,3 +87,11 @@ CREATE TABLE "items_categories" (
 );
 
 CREATE INDEX idx_items_categories_item_handle ON items_categories(item_handle);
+
+DROP TABLE IF EXISTS "hierarchy_ops";
+CREATE TABLE "hierarchy_ops" (
+    "id"        INTEGER PRIMARY KEY AUTOINCREMENT,
+    "op_name"   TEXT    NOT NULL COLLATE NOCASE,
+    "json_op"   TEXT    NOT NULL COLLATE NOCASE,
+    "payload"   TEXT
+);

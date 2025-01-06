@@ -36,7 +36,7 @@ The first CTE `json_ops` defines a table:
 | ----------- | ----------- |
 | ls_cat_desc | `{payload}` |
 
-where `{payload}` is a JSON-formatted string:
+where `{payload}` is a JSON array of target category paths:
 
 ```json
 [
@@ -54,7 +54,7 @@ The second CTE `base_ops` unpacks the JSON object into a table:
 |           2           | /Library/Drafts/DllTools/Dem - DLL/memtools |
 |           3           | /Project/SQLiteDBdev                        |
 
-The last CTE nodes retrieves descendant categories from the `categories` table.
+The last CTE `nodes` retrieves descendant categories from the `categories` table.
 
 ## Parameterized Query
 
@@ -194,10 +194,11 @@ with JSON based input (`$json_op`) and output (`payload`).
 
 ---
 
-| [**<= Materialized path operations**][MPops] | [**Next: High Level API =>**][MPops] |
-| -------------------------------------------- | ------------------------------------ |
+| [**<= Materialized path operations**][MPops] | [**Next: Implementation =>**][Implementation] |
+| -------------------------------------------- | --------------------------------------------- |
 
 
 <!-- References -->
 
 [MPops]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPops.md
+[Implementation]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Implementation.md
