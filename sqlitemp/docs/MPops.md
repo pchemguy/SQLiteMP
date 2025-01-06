@@ -1,15 +1,24 @@
 # Materialized path operations
 
-- **CREATE**
-    - **paths (categories)**: given a set of paths, create all necessary categories.
-    - **items**: given a set of items, add them to the `items` table.
-    - **item associations**: given a set of item associations, add information to the association table.
+- **CREATE / IMPORT**
+    - **paths (categories)**: Given a set of paths, create all necessary categories.
+    - **items**: Given a set of items, add them to the `items` table.
+    - **item associations**: Given a set of item associations, add information to the association table.
 - **SELECT / RETRIEVE**
-    - **descendant categories**: given a set of categories, retrieve the set of children or the entire subtrees.
-    - **items**: given a set of categories, retrieve the set of directly associated items or all items belonging to subtrees defined by the specified categories.
-    - **associated categories**: retrieve the set of categories associated with a given item.
-    - **item association counts**: given a set of items, retrieve the number of categories associated with each item (whenever item information is edited, it should be immediately obvious if the item is associated with multiple categories)
+    - **descendant categories**: Given a set of categories, retrieve the set of children or the entire subtrees.
+    - **items**: Given a set of categories, retrieve the set of directly associated items or all items belonging to subtrees defined by the specified categories.
+    - **associated categories**: Given an item, retrieve the set of associated categories.
+    - **item association counts**: Given a set of items, retrieve the number of categories associated with each item (whenever item information is edited, it should be immediately obvious if the item is associated with multiple categories).
 - **UPDATE / MODIFY**
+    - **move tree**: Given a category and a new path, update the category subtree and related item associations (a partial equivalent of the file system directory **rename/move** operations, see notes below).
+    - **copy tree**: Given a category and a new path, update the category subtree and related item associations (a partial equivalent equivalent of the file system directory **copy** operation, see notes below).
 - **DELETE**
-- **IMPORT**
+    - **delete tree**: Given a set of categories, delete the associated subtrees and related item associations (a partial equivalent of the file system directory **delete** operation, see notes below).
+    - **remove specific associations**: Given a category and a set of associated items, remove items from the category (a partial equivalent of the file system file symbolic link **delete** operation, see notes below).
+    - **remove all associations**: Given a set of items, remove all associated categories.
+    - **delete items**: Given a a set of items, delete them (a partial equivalent of the file system file **delete** operation, see notes below).
 - **EXPORT**
+    - **categories**
+    - **items**
+    - **item association**
+    - **everything**
