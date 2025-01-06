@@ -19,6 +19,8 @@ CREATE TABLE "categories" (
     "parent_path"   TEXT    COLLATE NOCASE
                                 REFERENCES "categories"("path") ON DELETE CASCADE ON UPDATE CASCADE,
                             -- Used for housekeeping purposes
+    "flag"          TEXT    COLLATE NOCASE,
+                            -- Used for housekeeping purposes
     "ascii_id"      TEXT    NOT NULL UNIQUE COLLATE BINARY
                             GENERATED ALWAYS AS (
                                 char(

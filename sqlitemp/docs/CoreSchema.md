@@ -7,6 +7,7 @@
 | **`id`**               |    **INTEGER**<br>**PK**    | 64-bit integer, restricted (but not enforced) to a subset, where each byte is an ASCII code of an alphanumeric character.                                                                                                                                                       |
 | **`name`**             |          **TEXT**           | Case-insensitive category name, prohibited characters include colon, comma, double quote, slashes, TAB, CR, LF.                                                                                                                                                                 |
 | **`parent_path`**      |          **TEXT**           | Forward-slash-sepated path not including the name of the category. `parent_path` includes leading, but not trailing '/' and is set to NULL for top-level categories. `parent_path` references the generated `path` field with propagation on both update and delete operations. |
+| **`flag`**             |          **TEXT**           | Used for housekeeping purposes.                                                                                                                                                                                                                                                 |
 | **`ascii_id`**         |  **TEXT**<br>**GENERATED**  | Case-sensitive ASCII representation of the `id` field.                                                                                                                                                                                                                          |
 | **`path`**             |  **TEXT**<br>**GENERATED**  | Constructed from `parent_path` and `name`.                                                                                                                                                                                                                                      |
 
@@ -28,6 +29,10 @@
 | **`item_handle`**      |          **TEXT**           | Item handle.                 |
 
 The minimalistic `items_categories` table includes two fields forming the table primary key. The PK is set to REPLACE rows on conflict, which is a sensible strategy simplifying the SQL code for MP operations. Conflicts may occur, for example, during bulk UPDATE or INSERT operations. For the INSERT operation, the IGNORE resolution works equally well. However, in case of the UPDATE operation, the IGNORE resolution would incorrectly keep the old association in the table.
+
+## SQL
+
+See the SQL code of the core schema below (and also in the [file][CoreSchema]):
 
 <details>  
 <summary><b>Core schema</b></summary>  
@@ -54,6 +59,8 @@ CREATE TABLE "categories" (
     "parent_path"   TEXT    COLLATE NOCASE
                                 REFERENCES "categories"("path") ON DELETE CASCADE ON UPDATE CASCADE,
                             -- Used for housekeeping purposes
+    "flag"          TEXT    COLLATE NOCASE,
+                            -- Textual representation of the ID
     "ascii_id"      TEXT    NOT NULL UNIQUE COLLATE BINARY
                             GENERATED ALWAYS AS (
                                 char(
