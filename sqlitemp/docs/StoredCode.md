@@ -1,10 +1,8 @@
-# High Level API Approach
+# Storing Code in an SQLite Database
 
-## Retrieve Descendant Categories
+To demonstrate the key ideas, let's start with a basic example that retrieves the list of descendant categories for a given set of nodes:
 
-### Base Query
-
-Let's start with a basic example that retrieves the list of descendant categories for a given set of nodes:
+## Base Query
 
 ```sql
 -- Retrieves descendant categories
@@ -58,7 +56,7 @@ The second CTE `base_ops` unpacks the JSON object into a table:
 
 The last CTE nodes retrieves descendant categories from the `categories` table.
 
-### Parameterized Query
+## Parameterized Query
 
 The next logical step would be to convert the query above into a parameterized query for use in an application:
 
@@ -83,7 +81,7 @@ ORDER BY path;
 
 but let us explore a different approach.
 
-### Hierarchy Operations Table
+## Hierarchy Operations Table
 
 Let's define another table:
 
@@ -181,7 +179,7 @@ END;
 
 The trigger code packs retrieved categories into a JSON string and sets the `payload` field of the record defining the operation. 
 
-### Summary
+## Summary
 
 By leveraging a strategy that combines JSON-based input and output with views and triggers, it is possible to store complex code directly in an SQLite database, thereby minimizing the application's responsibility for managing SQL code. One significant advantage of using triggers is their ability to encapsulate multiple DML queries, functioning as a limited equivalent of stored procedures. According to the official documentation, top-level trigger statements do not support the `WITH` clause (CTE), but CTEs can be included in subqueries, making this limitation relatively minor. Views, on the other hand, can store complex `SELECT` queries, which may be used to return data to the application or preprocess parameterized queries that serve as inputs for trigger routines.
 
