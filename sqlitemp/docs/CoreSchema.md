@@ -128,11 +128,13 @@ CREATE INDEX idx_items_categories_item_handle ON items_categories(item_handle);
 
 ---  
 
-| [**<= Previous: Overview**][Overview] | [**Next: TMaterialized path operations=>**][CoreSchema] |
-| ------------------------------------- | ------------------------------------------------------- |
+| [**<= Previous: Overview**][Overview] | [**Next: Materialized path operations=>**][CoreSchema] |
+| ------------------------------------- | ------------------------------------------------------ |
 
 
 <!-- References-->
 
 [CoreSchema]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/src/sqlitemp/sql/core_schema.sql
 [Overview]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Overview.md
+[MPops]
+
