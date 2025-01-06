@@ -1,15 +1,15 @@
 # Materialized path operations
 
-- **CREATE / IMPORT**
-  - **Paths (Categories)**: Given a set of paths, create all necessary categories.
-  - **Items**: Given a set of items, add them to the `items` table.
-  - **Item Associations**: Given a set of item associations, add information to the association table.
-
 - **SELECT / RETRIEVE**
   - **Descendant Categories**: Given a set of categories, retrieve the set of children or the entire subtrees.
   - **Items**: Given a set of categories, retrieve the set of directly associated items or all items belonging to subtrees defined by the specified categories.
   - **Associated Categories**: Given an item, retrieve the set of associated categories.
   - **Item Association Counts**: Given a set of items, retrieve the number of categories associated with each item (this information can be used to ensure that whenever item information is edited, it is immediately clear if the item is associated with multiple categories).
+
+- **CREATE / IMPORT**
+  - **Paths (Categories)**: Given a set of paths, create all necessary categories.
+  - **Items**: Given a set of items, add them to the `items` table.
+  - **Item Associations**: Given a set of item associations, add information to the association table.
 
 - **UPDATE / MODIFY**
   - **Move Tree**: Given a category and a new path, update the category subtree and related item associations (a partial equivalent of the file system directory **rename/move** operations; see notes below).
