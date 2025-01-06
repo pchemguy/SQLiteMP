@@ -144,4 +144,4 @@ CREATE INDEX idx_items_categories_item_handle ON items_categories(item_handle);
 [CoreSchema]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/src/sqlitemp/sql/core_schema.sql
 [Overview]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Overview.md
 [MPops]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPops.md
-
+[core dummy data]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/src/sqlitemp/sql/core_schema_dummy_data.sql
