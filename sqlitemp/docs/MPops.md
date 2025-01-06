@@ -52,11 +52,11 @@ This project adopts the convention of never deleting items implicitly, even duri
 
 ---
 
-| [**<= Previous: The Core Schema**][CoreSchema] | [**Next: High Level API =>**][HighLevelAPI] |
-| ---------------------------------------------- | ------------------------------------------- |
+| [**<= Previous: The Core Schema**][CoreSchema] | [**Next:  High Level API Approach =>**][ HighLevelAPIApproach] |
+| ---------------------------------------------- | -------------------------------------------------------------- |
 
 
 <!-- References -->
 
 [CoreSchema]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/CoreSchema.md
-[HighLevelAPI]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/HighLevelAPI.md
+[HighLevelAPIApproach]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/HighLevelAPIApproach.md
