@@ -24,7 +24,7 @@ WITH
     nodes AS (
         SELECT categories.*
         FROM categories, base_ops
-        WHERE categories.path || '/' LIKE base_ops.path || '/%'
+        WHERE categories.parent_path || '/' LIKE base_ops.path || '/%'
     )
 SELECT * FROM nodes
 ORDER BY path;
@@ -73,7 +73,7 @@ WITH
     nodes AS (
         SELECT categories.*
         FROM categories, base_ops
-        WHERE categories.path || '/' LIKE base_ops.path || '/%'
+        WHERE categories.parent_path || '/' LIKE base_ops.path || '/%'
     )
 SELECT * FROM nodes
 ORDER BY path;
@@ -121,6 +121,7 @@ SELECT * FROM json_ops;
 The content of the `json_ops` CTE is identical to the data in the earlier query. The `op_name = 'ls_cat_desc'` value represents an arbitrarily defined operation name used to retrieve the list of descendant categories. Now, let’s define a view:
 
 ```sql
+-- Retrieves descendant categories
 DROP VIEW IF EXISTS "ls_cat_desc";
 CREATE VIEW "ls_cat_desc" AS
 WITH
@@ -140,7 +141,7 @@ WITH
     nodes AS (
         SELECT categories.*
         FROM categories, base_ops
-        WHERE categories.path || '/' LIKE base_ops.path || '/%'
+        WHERE categories.parent_path || '/' LIKE base_ops.path || '/%'
     )
 SELECT * FROM nodes
 ORDER BY path;
@@ -161,7 +162,7 @@ SELECT * FROM ls_cat_desc;
 Finally, let's us define a trigger:
 
 ```sql
--- Trigger to insert new paths after insert
+-- Retrieves descendant categories
 DROP TRIGGER IF EXISTS "ls_cat_desc";
 CREATE TRIGGER "ls_cat_desc"
 AFTER INSERT ON "hierarchy_ops"
