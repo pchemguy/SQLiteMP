@@ -2,6 +2,8 @@
 
 ## Retrieve Descendant Categories
 
+### Base Query
+
 Let's start with a basic example that retrieves the list of descendant categories for a given set of nodes:
 
 ```sql
@@ -55,6 +57,33 @@ The second CTE `base_ops` unpacks the JSON object into a table:
 |           3           | /Project/SQLiteDBdev                        |
 
 The last CTE nodes retrieves descendant categories from the `categories` table.
+
+### Parameterized Query
+
+The next conventional step might be converting the query above into a parameterized query for subsequent use by an application:
+
+```sql
+-- Retrieves descendant categories
+WITH
+    json_ops(op_name, json_op) AS (VALUES ('ls_cat_desc', ?)),
+    base_ops AS (
+        SELECT
+            "key" + 1 AS opid,
+            value AS path
+        FROM json_ops AS jo, json_each(jo.json_op) AS terms
+    ),
+    nodes AS (
+        SELECT categories.*
+        FROM categories, base_ops
+        WHERE categories.path || '/' LIKE base_ops.path || '/%'
+    )
+SELECT * FROM nodes
+ORDER BY path;
+```
+
+but let us explore a different approach.
+
+## 
 
 ---
 
