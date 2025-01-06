@@ -21,7 +21,7 @@ WITH
             value AS path
         FROM json_ops AS jo, json_each(jo.json_op) AS terms
     ),
-    nodes AS(
+    nodes AS (
         SELECT categories.*
         FROM categories, base_ops
         WHERE categories.path || '/' LIKE base_ops.path || '/%'
@@ -54,6 +54,7 @@ The second CTE `base_ops` unpacks the JSON object into a table:
 |           2           | /Library/Drafts/DllTools/Dem - DLL/memtools |
 |           3           | /Project/SQLiteDBdev                        |
 
+The last CTE nodes retrieves descendant categories from the `categories` table.
 
 ---
 
