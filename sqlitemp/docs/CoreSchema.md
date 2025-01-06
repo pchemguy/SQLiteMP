@@ -128,8 +128,8 @@ CREATE INDEX idx_items_categories_item_handle ON items_categories(item_handle);
 
 ---  
 
-| [**<= Previous: Overview**][Overview] | [**Next: The Core Schema =>**][CoreSchema] |
-| ------------------------------------- | ------------------------------------------ |
+| [**<= Previous: Overview**][Overview] | [**Next: TMaterialized path operations=>**][CoreSchema] |
+| ------------------------------------- | ------------------------------------------------------- |
 
 
 <!-- References-->
