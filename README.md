@@ -1,3 +1,17 @@
+**SQLiteMP** is a proof-of-concept implementation of the materialized paths (MPs) tree model in SQL/SQLite.
+
+### **Features:**
+
+- **Common MP Operations**: Supports creation, deletion, movement, copying, importing, and exporting for managing hierarchical category systems and associated items.
+- **JSON-Based API**: Offers a minimalistic SQL interface for streamlined interaction.
+- **Encapsulated SQL Logic**: Improves modularity and minimizes code coupling by embedding SQL logic within database views and triggers.
+- **Simplified SQL Management**: Minimizes the application's need to handle SQL code directly.
+- **Pseudo-Parameterized Views and Triggers**: Implements parameterization through auxiliary buffer tables for added flexibility.
+- **Standard SQLite Compatibility**: Fully implemented using the standard SQLite library.
+- **Structured and Maintainable Code**: Leverages ordinary and recursive common table expressions (CTEs) for clear and maintainable code.
+
+---
+
 # SQLiteMP - Materialized Paths in SQLite with Abstract Interface
 
 The materialized paths (MPs) model is a common approach for storing hierarchical data in relational databases. With certain general restrictions, core MP functionality can be implemented in SQL using stored procedures, providing a higher-level abstraction for applications. However, this project targets the standard SQLite library, which lacks native support for stored procedures. Consequently, the primary objective of this project is to explore alternative methods for encapsulating MP functionality using the advanced features of the standard SQLite library. The project specifically aims to rely exclusively on library-supported code (primarily SQL) while establishing an efficient code management strategy.
