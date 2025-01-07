@@ -1064,6 +1064,73 @@ SELECT * FROM json_ops;
 
 
 
+### Reset Item Associations - `reset_item_cat`
+
+#### View
+
+```sql
+-- Prepares the list of item associations to be reset
+DROP VIEW IF EXISTS "reset_item_cat";
+CREATE VIEW "reset_item_cat" AS
+WITH
+    json_ops AS (
+		SELECT json_op
+		FROM hierarchy_ops
+		WHERE op_name = 'reset_item_cat'
+		ORDER BY id DESC
+		LIMIT 1
+    ),
+    base_ops AS (
+        SELECT
+            value AS item_handle
+        FROM json_ops AS jo, json_each(jo.json_op) AS terms
+    )
+SELECT * FROM base_ops;
+```
+
+#### Trigger
+
+```sql
+-- Resets item associations
+DROP TRIGGER IF EXISTS "reset_item_cat";
+CREATE TRIGGER "reset_item_cat"
+AFTER INSERT ON "hierarchy_ops"
+FOR EACH ROW
+WHEN NEW."op_name" = 'reset_item_cat'
+BEGIN
+    DELETE FROM items_categories
+    WHERE item_handle IN (SELECT * FROM reset_item_cat);
+END;
+```
+
+#### Dummy data
+
+```sql
+-- Data for item associations to be reset
+WITH
+    json_ops(op_name, json_op) AS (
+        VALUES
+            ('reset_item_cat', json('
+                [
+                    "0764037c54441d43fc57d370dfe203e6",
+                    "09ec2bbbb61735163017bee90e46aaed",
+                    "2b25a438f79f9449101a5cb5abdb4d5f",
+                    "396e16c24fbade080482aaf84ef63cc5",
+                    "5f073b688ca9cf337876eea52afc04f5",
+                    "5f6532836598595c39d75e403cff769f",
+                ]            
+            '))
+    )
+INSERT INTO hierarchy_ops(op_name, json_op)
+SELECT * FROM json_ops;
+```
+
+
+
+
+
+
+
 # DUMMY
 
 ---
