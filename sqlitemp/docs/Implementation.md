@@ -18,6 +18,7 @@ Each hierarchy operation may have an associated a view and trigger.
 | DELETE | Categories                     | `del_cat`            |
 | DELETE | Item associations              | `del_item_cat`       |
 | DELETE | Item associations reset        | `reset_item_cat`     |
+| DELETE | Items                          | `del_item`           |
 
 ---
 ---
@@ -1130,6 +1131,68 @@ SELECT * FROM json_ops;
 
 
 
+
+
+### Delete Items - `del_item`
+
+#### View
+
+```sql
+-- Prepares the list of items to be deleted
+DROP VIEW IF EXISTS "del_item";
+CREATE VIEW "del_item" AS
+WITH
+    json_ops AS (
+		SELECT json_op
+		FROM hierarchy_ops
+		WHERE op_name = 'del_item'
+		ORDER BY id DESC
+		LIMIT 1
+    ),
+    base_ops AS (
+        SELECT
+            value AS item_handle
+        FROM json_ops AS jo, json_each(jo.json_op) AS terms
+    )
+SELECT * FROM base_ops;
+```
+
+#### Trigger
+
+```sql
+-- Deletes items
+DROP TRIGGER IF EXISTS "del_item";
+CREATE TRIGGER "del_item"
+AFTER INSERT ON "hierarchy_ops"
+FOR EACH ROW
+WHEN NEW."op_name" = 'del_item'
+BEGIN
+    DELETE FROM items
+    WHERE item_handle IN (SELECT * FROM del_item);
+END;
+```
+
+#### Dummy data
+
+```sql
+-- Data for items to be deleted
+WITH
+    json_ops(op_name, json_op) AS (
+        VALUES
+            ('del_item', json('
+                [
+                    "0764037c54441d43fc57d370dfe203e6",
+                    "09ec2bbbb61735163017bee90e46aaed",
+                    "2b25a438f79f9449101a5cb5abdb4d5f",
+                    "396e16c24fbade080482aaf84ef63cc5",
+                    "5f073b688ca9cf337876eea52afc04f5",
+                    "5f6532836598595c39d75e403cff769f",
+                ]            
+            '))
+    )
+INSERT INTO hierarchy_ops(op_name, json_op)
+SELECT * FROM json_ops;
+```
 
 # DUMMY
 
