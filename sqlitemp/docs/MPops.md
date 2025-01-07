@@ -21,7 +21,6 @@
   - **Move Tree**: Given a category and a new path, update the category subtree and related item associations (a partial equivalent of the file system directory **rename/move** operations; see notes below).
   - **Copy Tree**: Given a category and a new path, update the category subtree and related item associations (a partial equivalent of the file system directory **copy** operation; see notes below).
   - **Move Items**: Given *source* and *destination* categories and a set of associated items, change association from *source* to *destination*.
-  - **Add Items**: Given  a category and a set of items, create item associations.
 
 - **EXPORT**
   - **Categories**

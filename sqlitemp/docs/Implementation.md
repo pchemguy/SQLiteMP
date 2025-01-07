@@ -20,6 +20,7 @@ Each hierarchy operation may have an associated a view and trigger.
 | DELETE | Item associations reset        | `reset_item_cat`     |
 | DELETE | Items                          | `del_item`           |
 | MODIFY | Move item associations         | `mv_item_cat`        |
+| MODIFY | Move tree                      | `mv_tree`            |
 
 ---
 ---
@@ -1249,6 +1250,149 @@ WITH
                     "5e26004e2f286e8e2d166bd8fc2f7684",
                 ]            
             }'))
+    )
+INSERT INTO hierarchy_ops(op_name, json_op)
+SELECT * FROM json_ops;
+```
+
+
+
+
+
+
+
+
+
+### Move Tree - `mv_tree`
+
+#### View
+
+```sql
+-- Prepares the list of categories to be moved
+DROP VIEW IF EXISTS "mv_tree";
+CREATE VIEW "mv_tree" AS
+WITH RECURSIVE
+    json_ops AS (
+        SELECT json_op
+        FROM hierarchy_ops
+        WHERE op_name = 'mv_tree'
+        ORDER BY id DESC
+        LIMIT 1
+    ),
+    base_ops AS (
+        SELECT
+            "key" + 1 AS opid,
+            '/' || trim(json_extract(value, '$.path_old'), '/') AS rootpath_old,
+            '/' || trim(json_extract(value, '$.path_new'), '/') AS rootpath_new
+        FROM json_ops AS jo, json_each(jo.json_op) AS terms
+    ),
+    /********************************************************************/
+    --------------------------- SUBTREES LIST ----------------------------
+    subtrees_old AS (
+        SELECT opid, ascii_id, path AS path_old
+        FROM base_ops, categories
+        WHERE path_old || '/' LIKE rootpath_old || '/%'
+        ORDER BY opid, path_old
+    ),
+    /********************************************************************/
+    ----------------------------- MOVE LOOP ------------------------------
+    LOOP_MOVE AS (
+            SELECT 0 AS opid, ascii_id, path_old AS path_new
+            FROM subtrees_old
+        UNION ALL
+            SELECT ops.opid, ascii_id,
+                   iif(BUFFER.path_new || '/' NOT LIKE rootpath_old || '/%', path_new,
+                       rootpath_new || substr(path_new, length(rootpath_old) + 1)
+                   ) AS path_new
+            FROM LOOP_MOVE AS BUFFER, base_ops AS ops
+            WHERE ops.opid = BUFFER.opid + 1
+    ),
+    /********************************************************************/
+    subtrees_new_base AS (
+        SELECT ascii_id, path_new,
+               json_extract('["' || replace(trim(path_new, '/'), '/', '", "') || '"]', '$[#-1]') AS name_new
+        FROM LOOP_MOVE
+        WHERE opid = (SELECT max(base_ops.opid) FROM base_ops)
+    ),
+    subtrees_path AS (
+        SELECT
+            (row_number() OVER (ORDER BY path_old)) AS priority,
+            trnew.ascii_id, path_old, path_new,
+            substr(path_new, 1, length(path_new) - length(name_new) - 1) AS prefix_new,
+            name_new
+        FROM subtrees_new_base AS trnew, subtrees_old AS trold
+        WHERE trnew.ascii_id = trold.ascii_id
+          AND path_old <> path_new
+    ),
+    new_paths AS (
+        SELECT
+            subtrees_path.*,
+            (cats.ascii_id IS NOT NULL) + (row_number() OVER (PARTITION BY path_new ORDER BY priority) - 1) AS target_exists
+        FROM subtrees_path LEFT JOIN categories AS cats ON path_new = path
+    )
+SELECT
+    ascii_id, path_old, path_new,
+    iif(prefix_new <> '', prefix_new, NULL) AS prefix_new,
+    name_new, target_exists
+FROM new_paths
+ORDER BY target_exists, path_old;
+```
+
+#### Trigger
+
+```sql
+-- Moves categories
+DROP TRIGGER IF EXISTS "mv_tree";
+CREATE TRIGGER "mv_tree"
+AFTER INSERT ON "hierarchy_ops"
+FOR EACH ROW
+WHEN NEW."op_name" = 'mv_tree'
+BEGIN
+    UPDATE OR IGNORE "categories" SET (name, parent_path) = (name_new, prefix_new)
+    FROM mv_tree AS mvt
+    WHERE mvt.target_exists = 0
+      AND mvt.path_old = categories.path;    
+
+    -- Update association tables
+    UPDATE "items_categories" SET cat_path = path_new
+    FROM mv_tree AS mvt
+    WHERE mvt.target_exists > 0
+      AND mvt.path_old = cat_path;
+      
+    -- Delete source categories colliding with existing destination
+    DELETE FROM "categories"
+    WHERE path IN (
+        SELECT path_old
+        FROM mv_tree AS mvt
+        WHERE mvt.target_exists > 0
+    );
+END;
+```
+
+#### Dummy data
+
+```sql
+-- Data for tree move
+WITH
+    json_ops(op_name, json_op) AS (
+        VALUES
+            ('mv_tree', json('[
+                {"path_old":"/BAZ/bld/booze/safe00",     "path_new":"/bbbbbb"},
+                {"path_old":"/BAZ/bld/tcl/tests/safe00", "path_new":"/safe00"},
+                {"path_old":"/safe00",                   "path_new":"/safe"},
+                {"path_old":"/BAZ/dev/msys2",            "path_new":"/BAZ/dev/msys"},
+                {"path_old":"/BAZ/bld/tcl/tests/preEEE", "path_new":"/preEEE"},
+                {"path_old":"/safe/modules",             "path_new":"/safe/modu"},
+                {"path_old":"/safe/modu/mod2",           "path_new":"/safe/modu/mod3"},
+                {"path_old":"/BAZ/bld/tcl/tests/ssub00", "path_new":"/safe/ssub00"},
+                {"path_old":"/BAZ/dev/msys/mingw32",     "path_new":"/BAZ/dev/msys/nix"},
+                {"path_old":"/safe/ssub00/modules",      "path_new":"/safe/modules"},
+                {"path_old":"/BAZ/bld/tcl/tests/manYYY", "path_new":"/man000"},
+                {"path_old":"/BAZ/dev/msys/nix/etc",     "path_new":"/BAZ/dev/msys/nix/misc"},
+                {"path_old":"/BAZ/bld/tcl/tests/manZZZ", "path_new":"/BAZ/bld/tcl/tests/man000"},
+                {"path_old":"/BAZ/bld/tcl/tests/man000", "path_new":"/man000"},
+                {"path_old":"/BAZ/bld/tcl/tests/safe11", "path_new":"/safe11"},
+            ]'))
     )
 INSERT INTO hierarchy_ops(op_name, json_op)
 SELECT * FROM json_ops;
