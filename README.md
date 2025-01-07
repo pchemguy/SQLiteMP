@@ -8,9 +8,9 @@
 - **JSON-Based API**: Offers a minimalistic SQL interface for seamless interaction.
 - **Encapsulated SQL Logic**: Improves modularity and reduces code coupling by embedding SQL logic within database views and triggers.
 - **Simplified SQL Management**: Reduces the application's need to handle complex SQL code directly.
+- **Structured and Maintainable Code**: Leverages ordinary and recursive common table expressions (CTEs) for clear and maintainable code.
 - **Pseudo-Parameterized Views and Triggers**: Implements parameterization through auxiliary buffer tables for added flexibility.
 - **Standard SQLite Compatibility**: Fully implemented using the standard SQLite library.
-- **Structured and Maintainable Code**: Leverages ordinary and recursive common table expressions (CTEs) for clear and maintainable code.
 
 ---
 
