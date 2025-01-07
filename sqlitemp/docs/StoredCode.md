@@ -193,6 +193,8 @@ SELECT payload FROM hierarchy_ops WHERE op_name = $op_name ORDER BY id DESC LIMI
 
 with JSON based input (`$json_op`) and output (`payload`).
 
+An additional advantage of this approach is that it ensures associated triggers are executed only once per operation (similar to `FOR EACH STATEMENT` triggers), regardless of the number of rows inserted into the target tables.
+
 ---
 
 | [**<= Materialized path operations**][MPops] | [**Next: Implementation =>**][Implementation] |
