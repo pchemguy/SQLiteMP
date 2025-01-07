@@ -768,19 +768,22 @@ DROP VIEW IF EXISTS "new_item_cat";
 CREATE VIEW "new_item_cat" AS
 WITH
     json_ops AS (
-		SELECT json_op
-		FROM hierarchy_ops
-		WHERE op_name = 'new_item_cat'
-		ORDER BY id DESC
-		LIMIT 1
+        SELECT json_op
+        FROM hierarchy_ops
+        WHERE op_name = 'new_item_cat'
+        ORDER BY id DESC
+        LIMIT 1
     ),
-    base_ops AS (
+    base_ops_packed AS (
         SELECT
             "key" + 1 AS opid,
-            json_extract(value, '$.op') AS op,
             json_extract(value, '$.cat_path') AS cat_path,
-            json_extract(value, '$.item_handle') AS item_handle
+            json_extract(value, '$.item_handles') AS item_handles
         FROM json_ops AS jo, json_each(jo.json_op) AS terms
+    ),
+    base_ops AS (
+        SELECT opid, cat_path, value AS item_handle
+        FROM base_ops_packed AS bop, json_each(bop.item_handles) AS terms
     ),
     filtered_terms AS (
         SELECT base_ops.cat_path, base_ops.item_handle
@@ -788,7 +791,9 @@ WITH
         LEFT JOIN items_categories USING (cat_path, item_handle)
         WHERE items_categories.item_handle IS NULL
     )
-SELECT cat_path, item_handle FROM filtered_terms;
+SELECT cat_path, item_handle
+FROM filtered_terms
+ORDER BY lower(cat_path), item_handle;
 ```
 
 #### Trigger
@@ -817,100 +822,78 @@ WITH
                 [
                     {
                         "cat_path": "/Assets",
-                        "item_handle": "f1281500266a0c49737643580e91f188"
-                    },
-                    {
-                        "cat_path": "/Assets",
-                        "item_handle": "ec5b638f0f2e1d3e70a404008b766145"
-                    },
-                    {
-                        "cat_path": "/Assets",
-                        "item_handle": "e8e18009c40bf038603f86b4d7d8c712"
-                    },
-                    {
-                        "cat_path": "/Assets",
-                        "item_handle": "fe207105e0f7ad3d6861742bc5030f79"
+                        "item_handles": [
+                            "f1281500266a0c49737643580e91f188",
+                            "ec5b638f0f2e1d3e70a404008b766145",
+                            "e8e18009c40bf038603f86b4d7d8c712",
+                            "fe207105e0f7ad3d6861742bc5030f79",
+                        ]
                     },
                     {
                         "cat_path": "/Assets/Diagrams",
-                        "item_handle": "ea656b9ffb993e6fd6d115af0d335cd2"
-                    },
-                    {
-                        "cat_path": "/Assets/Diagrams",
-                        "item_handle": "e8ec0b1284b6bfba26703fe87874e185"
-                    },
-                    {
-                        "cat_path": "/Assets/Diagrams",
-                        "item_handle": "e829a9ebe06e47ec764c421ba8550aff"
+                        "item_handles": [
+                            "ea656b9ffb993e6fd6d115af0d335cd2",
+                            "e8ec0b1284b6bfba26703fe87874e185",
+                            "e829a9ebe06e47ec764c421ba8550aff",
+                        ]
                     },
                     {
                         "cat_path": "/Library/DllTools/Dem - DLL/AddLib",
-                        "item_handle": "df5965bd43b2dd9b3c78428330136ec00"
+                        "item_handles": ["df5965bd43b2dd9b3c78428330136ec00"]
                     },
                     {
                         "cat_path": "/Library/DllTools/Dem - DLL/AddLib/docs",
-                        "item_handle": "f44c82c9953acda15a1b2ff73a0d4ca00"
-                    },
-                    {
-                        "cat_path": "/Library/DllTools/Dem - DLL/AddLib/docs",
-                        "item_handle": "fdc86b4a4b2332606fc5cef72969b10a0"
+                        "item_handles": [
+                            "f44c82c9953acda15a1b2ff73a0d4ca00",
+                            "fdc86b4a4b2332606fc5cef72969b10a0",
+                        ]
                     },
                     {
                         "cat_path": "/Library/DllTools/Dem - DLL/memtools",
-                        "item_handle": "e102a4954b60ebf024498b87b033c9610"
+                        "item_handles": ["e102a4954b60ebf024498b87b033c9610"]
                     },
                     {
                         "cat_path": "/Project/SQLite/Checks",
-                        "item_handle": "d2d3a850f6495f38ee6961d4eee2c5ee"
+                        "item_handles": ["d2d3a850f6495f38ee6961d4eee2c5ee"]
                     },
                     {
                         "cat_path": "/Project/SQLite/Fixtures",
-                        "item_handle": "d6b43bf13d30207b5147d8ecaa5f230c"
-                    },
-                    {
-                        "cat_path": "/Project/SQLite/Fixtures",
-                        "item_handle": "ff05b9ccc2185c93d1acf00bb3dbdf73"
-                    },
-                    {
-                        "cat_path": "/Project/SQLite/MetaSQL/Examples",
-                        "item_handle": "e84a16319e2a7a2f001996ea610b91d2"
+                        "item_handles": [
+                            "d6b43bf13d30207b5147d8ecaa5f230c",
+                            "ff05b9ccc2185c93d1acf00bb3dbdf73",
+                        ]
                     },
                     {
                         "cat_path": "/Project/SQLite/MetaSQL/Examples",
-                        "item_handle": "fb351622f997ec7686e1cd0079dbccab"
-                    },
-                    {
-                        "cat_path": "/Project/SQLite/MetaSQL/Examples",
-                        "item_handle": "d10a1b89819187b75515de6c3400c417"
+                        "item_handles": [
+                            "e84a16319e2a7a2f001996ea610b91d2",
+                            "fb351622f997ec7686e1cd0079dbccab",
+                            "d10a1b89819187b75515de6c3400c417",
+                        ]
                     },
                     {
                         "cat_path": "/BAZ/bld",
-                        "item_handle": "f1281500266a0c49737643580e91f188"
+                        "item_handles": ["f1281500266a0c49737643580e91f188"]
                     },
                     {
                         "cat_path": "/BAZ/bld/tcl/tests",
-                        "item_handle": "df5965bd43b2dd9b3c78428330136ec00"
-                    },
-                    {
-                        "cat_path": "/BAZ/bld/tcl/tests",
-                        "item_handle": "e102a4954b60ebf024498b87b033c9610"
+                        "item_handles": [
+                            "df5965bd43b2dd9b3c78428330136ec00",
+                            "e102a4954b60ebf024498b87b033c9610",
+                            "e829a9ebe06e47ec764c421ba8550aff",
+                        ]
                     },
                     {
                         "cat_path": "/BAZ/bld/tcl/tests/manYYY",
-                        "item_handle": "f44c82c9953acda15a1b2ff73a0d4ca01"
+                        "item_handles": [
+                            "f44c82c9953acda15a1b2ff73a0d4ca01",
+                             "ec4d23b69f463d8314adfec69748354e",
+                        ]
                     },
                     {
                         "cat_path": "/BAZ/bld/tcl/tests/manYYY/etc",
-                        "item_handle": "fdc86b4a4b2332606fc5cef72969b10a1"
+                        "item_handles": ["fdc86b4a4b2332606fc5cef72969b10a1"]
                     },
-                    {
-                        "cat_path": "/BAZ/bld/tcl/tests",
-                        "item_handle": "e829a9ebe06e47ec764c421ba8550aff"
-                    },
-                    {
-                        "cat_path": "/BAZ/bld/tcl/tests/manYYY",
-                        "item_handle": "ec4d23b69f463d8314adfec69748354e"
-                    }
                 ]
             '))
     )
@@ -1193,6 +1176,11 @@ WITH
 INSERT INTO hierarchy_ops(op_name, json_op)
 SELECT * FROM json_ops;
 ```
+
+
+## MODIFY
+
+### Assign Items - `add_item_cat`
 
 # DUMMY
 
