@@ -431,11 +431,12 @@ WITH
         FROM json_ops AS jo, json_each(jo.json_op) AS terms
     ),
     nodes AS (
-        SELECT items.*
-        FROM categories, items, items_categories, base_ops
-        WHERE categories.path = base_ops.path
-		  AND categories.path = items_categories.cat_path
+        SELECT items.*,  count(cnts.cat_path) AS cat_cnt
+        FROM items, items_categories, items_categories AS cnts, base_ops
+        WHERE items_categories.cat_path = base_ops.path
 		  AND items.handle = items_categories.item_handle
+		  AND items.handle = cnts.item_handle
+		GROUP BY cnts.item_handle
     )
 SELECT * FROM nodes
 ORDER BY name;
@@ -449,7 +450,8 @@ WITH
     json_ops(op_name, json_op) AS (
         VALUES
             ('cnt_item_child_cat', json('[' || concat_ws(',',
-                '"/Project/SQLiteDBdev"'
+				'"/Project/SQLite/MetaSQL/Examples"',
+                '"/Assets/Diagrams"'
             ) || ']'))
     )
 INSERT INTO hierarchy_ops(op_name, json_op)
