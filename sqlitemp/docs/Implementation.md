@@ -13,6 +13,8 @@ Each hierarchy operation may have an associated a view and trigger.
 | SELECT | Child items association counts | `cnt_item_child_cat` |
 | CREATE | Categories                     | new_cat              |
 | CREATE | Items                          | new_item             |
+| CREATE | Item associations              | new_item_cat         |
+| CREATE | *Import (everything)*          | *not implemented*    |
 
 ---
 ---
@@ -556,7 +558,7 @@ SELECT * FROM nodes
 ORDER BY lower(ifnull(parent_path, '') || '/' || name);
 ```
 
-##### Code Walkthrough
+#### Code Walkthrough
 
 **`json_ops`**, as before, retrieves the latest record from the `hierarchy_ops` table containing a list of slash-separated category paths to be created, for example:
 
@@ -751,6 +753,172 @@ INSERT INTO hierarchy_ops(op_name, json_op)
 SELECT * FROM json_ops;
 ```
 
+
+### Item Associations - `new_item_cat`
+
+#### View
+
+```sql
+-- Prepares the list of new item associations
+DROP VIEW IF EXISTS "new_item_cat";
+CREATE VIEW "new_item_cat" AS
+WITH
+    json_ops AS (
+		SELECT json_op
+		FROM hierarchy_ops
+		WHERE op_name = 'new_item_cat'
+		ORDER BY id DESC
+		LIMIT 1
+    ),
+    base_ops AS (
+        SELECT
+            "key" + 1 AS opid,
+            json_extract(value, '$.op') AS op,
+            json_extract(value, '$.cat_path') AS cat_path,
+            json_extract(value, '$.item_handle') AS item_handle
+        FROM json_ops AS jo, json_each(jo.json_op) AS terms
+    ),
+    filtered_terms AS (
+        SELECT base_ops.cat_path, base_ops.item_handle
+        FROM base_ops
+        LEFT JOIN items_categories USING (cat_path, item_handle)
+        WHERE items_categories.item_handle IS NULL
+    )
+SELECT cat_path, item_handle FROM filtered_terms;
+```
+
+#### Trigger
+
+```sql
+-- Generates new item associations
+DROP TRIGGER IF EXISTS "new_item_cat";
+CREATE TRIGGER "new_item_cat"
+AFTER INSERT ON "hierarchy_ops"
+FOR EACH ROW
+WHEN NEW."op_name" = 'new_item_cat'
+BEGIN
+    INSERT INTO items_categories(cat_path, item_handle)
+    SELECT cat_path, item_handle FROM new_item_cat;
+END;
+```
+
+#### Dummy data
+
+```sql
+-- Data for preparing the list of new item associations
+WITH
+    json_ops(op_name, json_op) AS (
+        VALUES
+            ('new_item_cat', json('
+                [
+                    {
+                        "cat_path": "/Assets",
+                        "item_handle": "f1281500266a0c49737643580e91f188"
+                    },
+                    {
+                        "cat_path": "/Assets",
+                        "item_handle": "ec5b638f0f2e1d3e70a404008b766145"
+                    },
+                    {
+                        "cat_path": "/Assets",
+                        "item_handle": "e8e18009c40bf038603f86b4d7d8c712"
+                    },
+                    {
+                        "cat_path": "/Assets",
+                        "item_handle": "fe207105e0f7ad3d6861742bc5030f79"
+                    },
+                    {
+                        "cat_path": "/Assets/Diagrams",
+                        "item_handle": "ea656b9ffb993e6fd6d115af0d335cd2"
+                    },
+                    {
+                        "cat_path": "/Assets/Diagrams",
+                        "item_handle": "e8ec0b1284b6bfba26703fe87874e185"
+                    },
+                    {
+                        "cat_path": "/Assets/Diagrams",
+                        "item_handle": "e829a9ebe06e47ec764c421ba8550aff"
+                    },
+                    {
+                        "cat_path": "/Library/DllTools/Dem - DLL/AddLib",
+                        "item_handle": "df5965bd43b2dd9b3c78428330136ec00"
+                    },
+                    {
+                        "cat_path": "/Library/DllTools/Dem - DLL/AddLib/docs",
+                        "item_handle": "f44c82c9953acda15a1b2ff73a0d4ca00"
+                    },
+                    {
+                        "cat_path": "/Library/DllTools/Dem - DLL/AddLib/docs",
+                        "item_handle": "fdc86b4a4b2332606fc5cef72969b10a0"
+                    },
+                    {
+                        "cat_path": "/Library/DllTools/Dem - DLL/memtools",
+                        "item_handle": "e102a4954b60ebf024498b87b033c9610"
+                    },
+                    {
+                        "cat_path": "/Project/SQLite/Checks",
+                        "item_handle": "d2d3a850f6495f38ee6961d4eee2c5ee"
+                    },
+                    {
+                        "cat_path": "/Project/SQLite/Fixtures",
+                        "item_handle": "d6b43bf13d30207b5147d8ecaa5f230c"
+                    },
+                    {
+                        "cat_path": "/Project/SQLite/Fixtures",
+                        "item_handle": "ff05b9ccc2185c93d1acf00bb3dbdf73"
+                    },
+                    {
+                        "cat_path": "/Project/SQLite/MetaSQL/Examples",
+                        "item_handle": "e84a16319e2a7a2f001996ea610b91d2"
+                    },
+                    {
+                        "cat_path": "/Project/SQLite/MetaSQL/Examples",
+                        "item_handle": "fb351622f997ec7686e1cd0079dbccab"
+                    },
+                    {
+                        "cat_path": "/Project/SQLite/MetaSQL/Examples",
+                        "item_handle": "d10a1b89819187b75515de6c3400c417"
+                    },
+                    {
+                        "cat_path": "/BAZ/bld",
+                        "item_handle": "f1281500266a0c49737643580e91f188"
+                    },
+                    {
+                        "cat_path": "/BAZ/bld/tcl/tests",
+                        "item_handle": "df5965bd43b2dd9b3c78428330136ec00"
+                    },
+                    {
+                        "cat_path": "/BAZ/bld/tcl/tests",
+                        "item_handle": "e102a4954b60ebf024498b87b033c9610"
+                    },
+                    {
+                        "cat_path": "/BAZ/bld/tcl/tests/manYYY",
+                        "item_handle": "f44c82c9953acda15a1b2ff73a0d4ca01"
+                    },
+                    {
+                        "cat_path": "/BAZ/bld/tcl/tests/manYYY/etc",
+                        "item_handle": "fdc86b4a4b2332606fc5cef72969b10a1"
+                    },
+                    {
+                        "cat_path": "/BAZ/bld/tcl/tests",
+                        "item_handle": "e829a9ebe06e47ec764c421ba8550aff"
+                    },
+                    {
+                        "cat_path": "/BAZ/bld/tcl/tests/manYYY",
+                        "item_handle": "ec4d23b69f463d8314adfec69748354e"
+                    }
+                ]
+            '))
+    )
+INSERT INTO hierarchy_ops(op_name, json_op)
+SELECT * FROM json_ops;
+```
+
+
+
+### Import
+
+A JSON containing a complete set of records (`items`, `categories`, `items_categories`) may be imported via individual handlers by taking advantage of recursive triggers. This idea is presently not implemented however. 
 
 # DUMMY
 
