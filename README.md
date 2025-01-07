@@ -4,8 +4,8 @@
 
 - **Common MP Operations**: Supports creation, deletion, movement, copying, importing, and exporting for managing hierarchical category systems and associated items.
 - **JSON-Based API**: Offers a minimalistic SQL interface for streamlined interaction.
-- **Encapsulated SQL Logic**: Improves modularity and minimizes code coupling by embedding SQL logic within database views and triggers.
-- **Simplified SQL Management**: Minimizes the application's need to handle SQL code directly.
+- **Encapsulated SQL Logic**: Improves modularity and reduces code coupling by embedding SQL logic within database views and triggers.
+- **Simplified SQL Management**: Reduces the application's need to handle SQL code directly.
 - **Pseudo-Parameterized Views and Triggers**: Implements parameterization through auxiliary buffer tables for added flexibility.
 - **Standard SQLite Compatibility**: Fully implemented using the standard SQLite library.
 - **Structured and Maintainable Code**: Leverages ordinary and recursive common table expressions (CTEs) for clear and maintainable code.
