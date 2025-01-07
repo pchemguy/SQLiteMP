@@ -10,6 +10,7 @@
 - **Simplified SQL Management**: Reduces the application's need to handle complex SQL code directly.
 - **Structured and Maintainable Code**: Leverages ordinary and recursive common table expressions (CTEs) for clear and maintainable code.
 - **Pseudo-Parameterized Views and Triggers**: Implements parameterization through auxiliary buffer tables for added flexibility.
+- **Recursive Triggers for DRY Code**: Facilitates development of complex SQL logic (not yet implemented).
 - **Standard SQLite Compatibility**: Fully implemented using the standard SQLite library.
 
 ---
