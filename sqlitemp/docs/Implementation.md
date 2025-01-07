@@ -11,10 +11,11 @@ Each hierarchy operation may have an associated a view and trigger.
 | SELECT | Item associations              | `ls_item_cat`        |
 | SELECT | Item association counts        | `cnt_item_cat`       |
 | SELECT | Child items association counts | `cnt_item_child_cat` |
-| CREATE | Categories                     | new_cat              |
-| CREATE | Items                          | new_item             |
-| CREATE | Item associations              | new_item_cat         |
+| CREATE | Categories                     | `new_cat`            |
+| CREATE | Items                          | `new_item`           |
+| CREATE | Item associations              | `new_item_cat`       |
 | CREATE | *Import (everything)*          | *not implemented*    |
+| DELETE | Categories                     | `del_cat`            |
 
 ---
 ---
@@ -919,6 +920,73 @@ SELECT * FROM json_ops;
 ### Import
 
 A JSON containing a complete set of records (`items`, `categories`, `items_categories`) may be imported via individual handlers by taking advantage of recursive triggers. This idea is presently not implemented however. 
+
+## DELETE
+
+### Categories - `del_cat`
+
+#### View
+
+```sql
+-- Prepares the list of categories to be deleted
+DROP VIEW IF EXISTS "del_cat";
+CREATE VIEW "del_cat" AS
+WITH
+    json_ops AS (
+		SELECT json_op
+		FROM hierarchy_ops
+		WHERE op_name = 'del_cat'
+		ORDER BY id DESC
+		LIMIT 1
+    ),
+    base_ops AS (
+        SELECT
+            "key" + 1 AS opid,
+            value AS path
+        FROM json_ops AS jo, json_each(jo.json_op) AS terms
+    )
+SELECT path FROM base_ops;
+```
+
+#### Trigger
+
+```sql
+-- Deletes categories
+DROP TRIGGER IF EXISTS "del_cat";
+CREATE TRIGGER "del_cat"
+AFTER INSERT ON "hierarchy_ops"
+FOR EACH ROW
+WHEN NEW."op_name" = 'del_cat'
+BEGIN
+    UPDATE categories SET flag = 'deleted' FROM del_cat
+    WHERE categories.path || '/' LIKE del_cat.path || '/%';
+    DELETE FROM categories WHERE flag = 'deleted';
+END;
+```
+
+Cascading foreign keys make sure that category subtrees and related item association are deleted. Items remain otherwise unaffected.
+
+#### Dummy data
+
+```sql
+-- Data for categories to be deleted
+WITH
+    json_ops(op_name, json_op) AS (
+        VALUES
+            ('del_cat', json('
+                [
+                    "/Assets/Diagrams",
+                    "/Library/Drafts/DllTools/Dem - DLL/memtools",
+                    "/Project/SQLiteDBdev",
+                ]            
+            '))
+    )
+INSERT INTO hierarchy_ops(op_name, json_op)
+SELECT * FROM json_ops;
+```
+
+
+
 
 # DUMMY
 

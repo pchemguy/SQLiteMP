@@ -11,15 +11,15 @@
   - **Items**: Given a set of items, add them to the `items` table.
   - **Item Associations**: Given a set of item associations, add information to the association table.
 
-- **UPDATE / MODIFY**
-  - **Move Tree**: Given a category and a new path, update the category subtree and related item associations (a partial equivalent of the file system directory **rename/move** operations; see notes below).
-  - **Copy Tree**: Given a category and a new path, update the category subtree and related item associations (a partial equivalent of the file system directory **copy** operation; see notes below).
-
 - **DELETE**
   - **Delete Tree**: Given a set of categories, delete the associated subtrees and related item associations (a partial equivalent of the file system directory **delete** operation; see notes below).
   - **Remove Specific Associations**: Given a category and a set of associated items, remove items from the category (a partial equivalent of the file system symbolic link **delete** operation; see notes below).
   - **Remove All Associations**: Given a set of items, remove all related category associations.
   - **Delete Items**: Given a set of items, delete them.
+
+- **UPDATE / MODIFY**
+  - **Move Tree**: Given a category and a new path, update the category subtree and related item associations (a partial equivalent of the file system directory **rename/move** operations; see notes below).
+  - **Copy Tree**: Given a category and a new path, update the category subtree and related item associations (a partial equivalent of the file system directory **copy** operation; see notes below).
 
 - **EXPORT**
   - **Categories**
