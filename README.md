@@ -1,6 +1,8 @@
+# SQLiteMP - Materialized Paths in SQLite with Abstract Interface
+
 **SQLiteMP** is a proof-of-concept implementation of the materialized paths (MPs) tree model in SQL/SQLite.
 
-### **Features**
+## **Features**
 
 - **Hierarchical Category Model**: Manages category systems with single-parent tree categories.
 - **Flexible Item Association**: Associates items with multiple categories, enabling more versatile data organization.
@@ -15,7 +17,23 @@
 
 ---
 
-# SQLiteMP - Materialized Paths in SQLite with Abstract Interface
+## **Codebase**
+
+The project primarily consists of organized SQL code. Currently, a directory structure has been created for a Python project, as Python is a suitable platform for setting up tests and a demo project. However, no actual Python development has been implemented yet.
+
+The SQL code is embedded in the documentation and is also included in modules located under `sqlitemp/src/sqlitemp/sql`. These modules contain the same code as documented and can be directly imported into an SQLite database. This directory also includes additional JSON and SQL modules with dummy data for manual testing.
+
+## **Testing**
+
+While I recognize the importance of a proper automated testing setup, only manual testing has been performed so far during the main code development process.
+
+## **Documentation**
+
+The project documentation is located in the `sqlitemp/docs` directory, with the entry file being `Overview.md`. These files can be viewed using GitHub’s file explorer by [opening][docs] them in a browser.
+
+Most documents are organized using Markdown headings. When a file is opened in GitHub’s file explorer, the command bar at the top includes a TOC (Table of Contents) icon as the rightmost icon. By default, the TOC sidebar is hidden, but clicking the icon opens it, enabling convenient navigation. Individual documents can be accessed via the file explorer sidebar on the left or by using the Previous/Next links at the bottom of each document.
+
+---
 
 The materialized paths (MPs) model is a common approach for storing hierarchical data in relational databases. With certain general restrictions, core MP functionality can be implemented in SQL using stored procedures, providing a higher-level abstraction for applications. However, this project targets the standard SQLite library, which lacks native support for stored procedures. Consequently, the primary objective of this project is to explore alternative methods for encapsulating MP functionality using the advanced features of the standard SQLite library. The project specifically aims to rely exclusively on library-supported code (primarily SQL) while establishing an efficient code management strategy.
 
