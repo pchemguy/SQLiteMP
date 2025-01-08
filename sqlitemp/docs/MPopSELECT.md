@@ -459,11 +459,11 @@ SELECT * FROM json_ops;
 
 ---
 
-| [**<= Previous: Storing Code in an SQLite Database**][StoredCode] | [**Next:  Storing Code in an SQLite Database =>**][StoredCode] |
-| ----------------------------------------------------------------- | -------------------------------------------------------------- |
+| [**<= Previous: Storing Code in an SQLite Database**][StoredCode] | [**Next:  CREATE Operations=>**][CREATE] |
+| ----------------------------------------------------------------- | ---------------------------------------- |
 
 
 <!-- References -->
 
 [StoredCode]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/StoredCode.md
-[SELECT]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopSELECT.md
+[CREATE]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopCREATE.md
