@@ -21,7 +21,7 @@
 
 The project primarily consists of organized SQL code. Currently, a directory structure has been created for a Python project, as Python is a suitable platform for setting up tests and a demo project. However, no actual Python development has been implemented yet.
 
-The SQL code is embedded in the documentation and is also included in modules located under `sqlitemp/src/sqlitemp/sql`. These modules contain the same code as documented and can be directly imported into an SQLite database. This directory also includes additional JSON and SQL modules with dummy data for manual testing.
+The SQL code is embedded in the documentation and is also included in modules located under [sqlitemp/src/sqlitemp/sql][SQL]. These modules contain the same code as documented and can be directly imported into an SQLite database. This directory also includes additional JSON and SQL modules with dummy data for manual testing.
 
 ## **Testing**
 
@@ -49,3 +49,4 @@ See [docs][] for further details.
 [SQLite View]: https://sqlite.org/lang_createview.html
 [SQLite Trigger]: https://sqlite.org/lang_createtrigger.html
 [docs]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Overview.md
+[SQL]: https://github.com/pchemguy/SQLiteMP/tree/main/sqlitemp/src/sqlitemp/sql
