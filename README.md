@@ -1,12 +1,12 @@
 # SQLiteMP - Materialized Paths in SQLite with Abstract Interface
 
-**SQLiteMP** is a proof-of-concept implementation of the materialized paths (MPs) tree model using pure SQL, fully embedded within an SQLite database.
+**SQLiteMP** is a proof-of-concept SQL implementation of the materialized paths (MPs) tree model, embedded within an SQLite database.
 
 ## **Features**
 
 - **Hierarchical Category Model**: Manages category systems with single-parent tree categories.
 - **Flexible Item Association**: Associates items with multiple categories, enabling more versatile data organization.
-- **Common MP Operations**: Supports creation, deletion, movement, copying, importing, and exporting.
+- **Common Materialized Paths Operations**: Supports creation, deletion, movement, copying, importing, and exporting.
 - **JSON-Based API**: Offers a minimalistic SQL interface for seamless interaction.
 - **Encapsulated SQL Logic**: Improves modularity and reduces code coupling by embedding SQL logic within database views and triggers.
 - **Simplified SQL Management**: Reduces the application's need to handle complex SQL code directly.
