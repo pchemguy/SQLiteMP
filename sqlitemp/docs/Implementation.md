@@ -1373,7 +1373,7 @@ Without the extra path separator, `path_old` = `/food/cheese` would incorrectly 
 
 ##### **`LOOP_MOVE`**
 
-The **`LOOP_MOVE`** CTE is recursive and the most complex component of this implementation. It sequentially applies all requested move operations to the prepared set of affected nodes. Intermediate states of the category tree and item associations are ignored, as only the final new path for each category is required to update the target database tables correctly.
+The **`LOOP_MOVE`** CTE is recursive and the most complex component of this implementation (see also this [RCTE tutorial][rec-cte]). It sequentially applies all requested move operations to the prepared set of affected nodes. Intermediate states of the category tree and item associations are ignored, as only the final new path for each category is required to update the target database tables correctly.
 
 Key logic in **`LOOP_MOVE`**:
 
