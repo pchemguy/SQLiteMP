@@ -197,11 +197,11 @@ An additional advantage of this approach is that it ensures associated triggers 
 
 ---
 
-| [**<= Materialized path operations**][MPops] | [**Next: Implementation =>**][Implementation] |
-| -------------------------------------------- | --------------------------------------------- |
+| [**<= Materialized path operations**][MPops] | [**Next: SELECT Operations =>**][SELECT] |
+| -------------------------------------------- | ---------------------------------------- |
 
 
 <!-- References -->
 
 [MPops]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPops.md
-[Implementation]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Implementation.md
+[SELECT]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopSELECT.md
