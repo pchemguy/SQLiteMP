@@ -445,6 +445,7 @@ SELECT * FROM json_ops;
 A JSON containing a complete set of records (`items`, `categories`, `items_categories`) may be imported via individual handlers by taking advantage of recursive triggers. This idea is presently not implemented however. 
 
 
+---
 
 | [**<= SELECT Operations**][SELECT] | [**Next: DELETE Operations =>**][DELETE] |
 | ---------------------------------- | ---------------------------------------- |
