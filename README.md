@@ -31,7 +31,7 @@ While I recognize the importance of a proper automated testing setup, only manua
 
 The project documentation is located in the `sqlitemp/docs` directory, with the entry file being `Overview.md`. These files can be viewed using GitHub’s file explorer by [opening][docs] them in a browser.
 
-Most documents are organized using Markdown headings. When a file is opened in GitHub’s file explorer, the command bar at the top includes a TOC (Table of Contents) icon as the rightmost icon. By default, the TOC sidebar is hidden, but clicking the icon opens it, enabling convenient navigation. Individual documents can be accessed via the file explorer sidebar on the left or by using the Previous/Next links at the bottom of each document.
+Most documents are structured using Markdown headings. When a file is opened in GitHub’s file explorer, the command bar at the top displays a TOC (Table of Contents) icon as the rightmost icon. This `README.md` file includes headings, so the TOC icon should appear in the command bar. By default, the TOC sidebar is hidden, but clicking the icon opens it, allowing for convenient navigation. Individual documents can be accessed through the file explorer sidebar on the left or by using the Previous/Next links at the bottom of each document.
 
 ---
 
