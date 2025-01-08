@@ -2,15 +2,15 @@
 
 Each hierarchy operation may have an associated a view and trigger.
 
-| Operation                      | `op_name`            |
-| ------------------------------ | -------------------- |
-| Descendant categories          | `ls_cat_desc`        |
-| Child categories               | `ls_cat_child`       |
-| Descendant items               | `ls_item_desc`       |
-| Child items                    | `ls_item_child`      |
-| Item associations              | `ls_item_cat`        |
-| Item association counts        | `cnt_item_cat`       |
-| Child items association counts | `cnt_item_child_cat` |
+| Group  | Operation                      | `op_name`            |
+| ------ | ------------------------------ | -------------------- |
+| SELECT | Descendant categories          | `ls_cat_desc`        |
+| SELECT | Child categories               | `ls_cat_child`       |
+| SELECT | Descendant items               | `ls_item_desc`       |
+| SELECT | Child items                    | `ls_item_child`      |
+| SELECT | Item associations              | `ls_item_cat`        |
+| SELECT | Item association counts        | `cnt_item_cat`       |
+| SELECT | Child items association counts | `cnt_item_child_cat` |
 
 ---
 ---
