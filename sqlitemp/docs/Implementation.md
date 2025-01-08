@@ -564,7 +564,7 @@ SELECT * FROM nodes
 ORDER BY lower(ifnull(parent_path, '') || '/' || name);
 ```
 
-#### Code Walkthrough
+#### Code walkthrough
 
 **`json_ops`**, as before, retrieves the latest record from the `hierarchy_ops` table containing a list of slash-separated category paths to be created, for example:
 
@@ -1337,6 +1337,26 @@ SELECT
 FROM new_paths
 ORDER BY target_exists, path_old;
 ```
+
+#### Code walkthrough
+
+The present implementation permits specifying a *compound* move operation, that is multiple categories to be moved in a sequence. As a result, the associated code is fairly complex.
+
+Move and copy tree operations necessitate perhaps the most complex code. 
+
+Note, however, that the code is, in a sense, overcomplicated. The input to the view code is a JSON object describing a series of category subtree move (copy for the copy operation) operations. In practice, each "atomic" operation can be persisted by the application individually even in cases when multiple nodes are actually moved. Code necessary to persist a single move/copy operation is significantly simpler. The main reasons for implementing the code presented here were to see whether it could be done at all and to practice SQL coding.
+
+The first two CTEs (**`json_ops`** and **`base_ops`**) as before unpack JSON-formatted input (see the **Dummy data** section below) into a table with each row describing a single operation as a combination of **`path_old`** and **`path_new`** values. Note that the **`base_ops`** CTE also performs basic path normalization by trimming the leading and trailing slashes, if present, and adding the leading slash:
+
+```sql
+'/' || trim(json_extract(value, '$.path_old'), '/')
+```
+
+Now, observe that the move operation cannot create new categories (as opposed to the copy operation). Whenever a category is moved, its `parent_path` and/or `name` fields need to be updated. The `parent_path` field of all its descendants also needs to be updated. Even though the foreign key on `parent_path` is set for cascading updates, the present code updates all affected categories explicitly to take care of potential name collisions. It is possible that the present code might be improved to reduce the number of duplicating operations involving implicitly updated descendant categories. The move operation may, however, delete categories in case of name collisions. When the new absolute path of a category being moved collides with an existing category, the category being moved is deleted and its item associations are merged with those of the existing destination category.
+
+Observe that only the categories having `path_old` as the prefix of their `path` field are affected by the move operation. When multiple move operations are defined, each such operation may affect categories with `path_old` prefix, but may also affected any categories affected by an earlier move operation. For this reason, if all categories having one of the `path_old` prefixes are selected at the beginning of the compound move
+
+
 
 #### Trigger
 
