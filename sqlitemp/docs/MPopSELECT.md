@@ -457,8 +457,6 @@ INSERT INTO hierarchy_ops(op_name, json_op)
 SELECT * FROM json_ops;
 ```
 
-
-
 ---
 
 | [**<= Previous: Storing Code in an SQLite Database**][StoredCode] | [**Next:  Storing Code in an SQLite Database =>**][StoredCode] |
