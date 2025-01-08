@@ -19,34 +19,29 @@
 
 ## **Codebase**
 
-The project primarily consists of organized SQL code. Currently, a directory structure has been created for a Python project, as Python is a suitable platform for setting up tests and a demo project. However, no actual Python development has been implemented yet.
-
-The SQL code is embedded in the documentation and is also included in modules located under [sqlitemp/src/sqlitemp/sql][SQL]. These modules contain the same code as documented and can be directly imported into an SQLite database. This directory also includes additional JSON and SQL modules with dummy data for manual testing.
-
-## **Testing**
-
-While I recognize the importance of a proper automated testing setup, only manual testing has been performed so far during the main code development process.
+The project directory is structured as a Python project, with plans to use Python for testing and demo purposes in the future. Currently, the project primarily consists of organized SQL code, which is embedded in the documentation and included in modules located under [sqlitemp/src/sqlitemp/sql][SQL]. These SQL modules replicate the documented code and can be directly imported into an SQLite database. Additionally, the directory contains JSON and SQL modules with dummy data for manual testing. While I recognize the importance of setting up proper automated testing, only limited manual testing has been conducted so far.
 
 ## **Documentation**
 
-The project documentation is located in the `sqlitemp/docs` directory, with the entry file being `Overview.md`. These files can be viewed using GitHub’s file explorer by [opening][docs] them in a browser.
-
-Most documents are structured using Markdown headings. When a file is opened in GitHub’s file explorer, the command bar at the top displays a TOC (Table of Contents) icon as the rightmost icon. This `README.md` file includes headings, so the TOC icon should appear in the command bar. By default, the TOC sidebar is hidden, but clicking the icon opens it, allowing for convenient navigation. Individual documents can be accessed through the file explorer sidebar on the left or by using the Previous/Next links at the bottom of each document.
+The project documentation is located in the [sqlitemp/docs][docs] directory, with the entry file being [Overview.md][Overview]. These files can be viewed using GitHub’s file explorer by [opening][Overview] them in a browser. Most documents are organized using Markdown headings. When such a file is opened in GitHub’s file explorer, the command bar at the top displays a TOC (Table of Contents) icon as the rightmost icon. This [README.md][] file includes Markdown headings, so the TOC icon should appear in the command bar. By default, the TOC sidebar is hidden, but clicking the icon reveals it, enabling convenient navigation. Individual documents can also be accessed through the file explorer sidebar on the left or by following the Previous/Next links at the bottom of each document.
 
 ---
 
-The materialized paths (MPs) model is a common approach for storing hierarchical data in relational databases. With certain general restrictions, core MP functionality can be implemented in SQL using stored procedures, providing a higher-level abstraction for applications. However, this project targets the standard SQLite library, which lacks native support for stored procedures. Consequently, the primary objective of this project is to explore alternative methods for encapsulating MP functionality using the advanced features of the standard SQLite library. The project specifically aims to rely exclusively on library-supported code (primarily SQL) while establishing an efficient code management strategy.
+The [materialized paths (MPs)][MP] model is a common approach for storing hierarchical data in relational databases. With certain general restrictions, core MP functionality can be implemented in SQL using stored procedures, providing a higher-level abstraction for applications. However, this project targets the standard SQLite library, which lacks native support for stored procedures. Consequently, the primary objective of this project is to explore alternative methods for encapsulating MP functionality using the advanced features of the standard SQLite library. The project specifically aims to rely exclusively on library-supported code (primarily SQL) while establishing an efficient code management strategy.
 
 The SQLiteMP project demonstrates a proof-of-concept implementation of an MP data model in SQLite. Building on the concepts and code presented in my earlier [SQLite SQL Tutorial][] - which includes SQL snippets for performing common MP operations on SQLite databases - this project leverages [views][SQLite View] and [triggers][SQLite Trigger] to encapsulate MP functionality directly within the database. These features provide capabilities similar to stored procedures, while the built-in JSON functionality enables the creation of a higher-level API, minimizing the application’s direct interaction with SQL.
 
-Although this project extends the GitHub-Pages-based SQLite SQL Tutorial, an important motivation for creating a separate repository was to simplify setup and maintenance by avoiding GitHub Pages. The standard GitHub file browser, with its automatic table-of-contents (TOC) support for Markdown-formatted files, offers a sufficiently user-friendly interface for documentation.
+Although this project extends the GitHub-Pages-based SQLite SQL Tutorial, an important motivation for creating a separate repository was to simplify setup and maintenance by avoiding GitHub Pages. The standard GitHub file browser offers a sufficiently user-friendly interface for navigation of small documentation bases, including automatic TOC generation for Markdown-formatted files.
 
-See [docs][] for further details.
+See [docs][Overview] for further details.
 
 <!-- References -->
 
 [SQLite SQL Tutorial]: https://pchemguy.github.io/SQLite-SQL-Tutorial
 [SQLite View]: https://sqlite.org/lang_createview.html
 [SQLite Trigger]: https://sqlite.org/lang_createtrigger.html
-[docs]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Overview.md
+[Overview]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Overview.md
+[README.md]: https://github.com/pchemguy/SQLiteMP/blob/main/README.md
+[MP]: https://pchemguy.github.io/SQLite-SQL-Tutorial/mat-paths
+[docs]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/
 [SQL]: https://github.com/pchemguy/SQLiteMP/tree/main/sqlitemp/src/sqlitemp/sql
