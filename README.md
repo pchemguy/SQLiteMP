@@ -1,6 +1,6 @@
 # SQLiteMP - Materialized Paths in SQLite with Abstract Interface
 
-**SQLiteMP** is a proof-of-concept implementation of the materialized paths (MPs) tree model in SQL/SQLite.
+**SQLiteMP** is a proof-of-concept implementation of the materialized paths (MPs) tree model using pure SQL, fully embedded within an SQLite database.
 
 ## **Features**
 
