@@ -446,10 +446,11 @@ A JSON containing a complete set of records (`items`, `categories`, `items_categ
 
 
 
-| [**<= SELECT Operations**][SELECT] | [**Next: SELECT Operations =>**][SELECT] |
+| [**<= SELECT Operations**][SELECT] | [**Next: DELETE Operations =>**][DELETE] |
 | ---------------------------------- | ---------------------------------------- |
 
 
 <!-- References -->
 
 [SELECT]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopSELECT.md
+[DELETE]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopDELETE.md
