@@ -1338,26 +1338,32 @@ FROM new_paths
 ORDER BY target_exists, path_old;
 ```
 
-#### Code walkthrough
+Here’s a revised version of your text:
 
-The present implementation permits specifying a *compound* move operation, that is multiple categories to be moved in a sequence. As a result, the associated code is fairly complex. In practice, each "atomic" operation can be persisted by the application individually even in cases when multiple nodes are actually moved. Code necessary to persist a single move/copy operation is significantly simpler. The main reasons for implementing the code presented here were to see whether it could be done at all and to practice SQL coding.
+---
 
-**`json_ops`** and **`base_ops`** as before unpack JSON-formatted input (see the **Dummy data** section below) into a table with each row describing a single operation as a combination of **`path_old`** and **`path_new`** values. Note that the **`base_ops`** CTE also performs basic path normalization by trimming the leading and trailing slashes, if present, and adding the leading slash:
+#### **Code Walkthrough**
+
+The current implementation supports a *compound* move operation, where multiple categories can be moved sequentially. This makes the associated code relatively complex. In practice, each "atomic" operation can be persisted by the application individually, even when multiple nodes are being moved. Code for persisting a single move/copy operation is significantly simpler. The primary motivations for implementing the code presented here were to test the feasibility of such an approach and to practice SQL coding.
+
+The **`json_ops`** and **`base_ops`** Common Table Expressions (CTEs) unpack JSON-formatted input (refer to the **Dummy Data** section below) into a table, where each row describes a single operation as a combination of **`path_old`** and **`path_new`** values. Additionally, the **`base_ops`** CTE performs basic path normalization by trimming leading and trailing slashes, if present, and adding a leading slash:
 
 ```sql
 '/' || trim(json_extract(value, '$.path_old'), '/')
 ```
 
-Now, observe that the move operation cannot create new categories (as opposed to the copy operation). Whenever a category is moved, its `parent_path` and/or `name` fields need to be updated. The `parent_path` field of all its descendants also needs to be updated. Even though the foreign key on `parent_path` is set for cascading updates, the present code updates all affected categories explicitly to take care of potential name collisions. It is possible that the present code might be improved to reduce the number of duplicating operations involving implicitly updated descendant categories. The move operation may, however, delete categories in case of name collisions. When the new absolute path of a category being moved collides with an existing category, the category being moved is deleted and its item associations are merged with those of the existing destination category (the "*keep existing destination*" convention).
+##### **Move Operation Behavior**
 
-**`subtrees_old`**
-Observe that only the categories having `path_old` as the prefix of their `path` field are affected by the move operation. When multiple move operations are defined, each such operation may affect categories with `path_old` prefix, but may also affected any categories affected by an earlier move operation. For this reason, if all categories with prefixes matching one of the `path_old` are selected at the beginning of the compound move, then this selection constitutes a complete set of "affected" categories. For merges, the existing categories are not affected directly due to the "keep existing destination" convention. **`subtrees_old`** generates the "affected" categories list. Note the extra path separator in the filter:
+The move operation cannot create new categories, unlike the copy operation. When a category is moved, its `parent_path` and/or `name` fields need to be updated, along with the `parent_path` fields of its descendants. Although the foreign key on `parent_path` is set for cascading updates, the current implementation explicitly updates all affected categories to address potential name collisions. There is potential for optimization to reduce redundant updates to descendant categories. In cases of name collisions, the move operation deletes the category being moved and merges its item associations with the existing destination category, following the "*keep existing destination*" convention.
+
+ **`subtrees_old`**
+Only categories with a `path_old` prefix in their `path` field are affected by the move operation. For compound moves, earlier operations may affect subsequent operations. Consequently, the selection of all categories with prefixes matching any `path_old` constitutes the complete set of "affected" categories. Existing categories are not directly modified due to the "*keep existing destination*" rule. The **`subtrees_old`** CTE generates this list of affected categories. Note the use of an additional path separator to ensure accurate matches:
 
 ```sql
 WHERE path_old || '/' LIKE rootpath_old || '/%'
 ```
 
-Consider a set of categories:
+For example, consider the following categories:
 
 ```json
 [
@@ -1367,11 +1373,13 @@ Consider a set of categories:
 ]
 ```
 
-Without the extra path separator, `path_old` = `/food/cheese` would wrongfully match all three. With the added path separator, only the first two categories are matched, as intended.
+Without the extra path separator, `path_old` = `/food/cheese` would incorrectly match all three categories. Adding the separator ensures that only the first two categories are matched as intended.
 
-**`LOOP_MOVE`** is a recursive CTE, and, probably the most convoluted piece. I have previously discussed the nature of [recursive CTEs][rec-cte], so I am not going into the details of recursive CTEs here. Basically, this loop sequentially applies all requested move operations to the previously prepared set of affected nodes. It is important to realize that the intermediate states of the category tree and item associations are unimportant. The **`LOOP_MOVE`** produces for each affected category its final new path, which may be a result of several changes due output of one earlier operation matching the input of a later operation. But the final new path for each category is the only information necessary to correctly update the target database tables.
+##### **`LOOP_MOVE`**
 
-Note the code:
+The **`LOOP_MOVE`** CTE is recursive and the most complex component of this implementation. It sequentially applies all requested move operations to the prepared set of affected nodes. Intermediate states of the category tree and item associations are ignored, as only the final new path for each category is required to update the target database tables correctly.
+
+Key logic in **`LOOP_MOVE`**:
 
 ```sql
 iif(lp.path_moved || '/' NOT LIKE ops.rootpath_old || '/%', lp.path_moved,
@@ -1379,19 +1387,29 @@ iif(lp.path_moved || '/' NOT LIKE ops.rootpath_old || '/%', lp.path_moved,
 ) AS path_moved
 ```
 
-To avoid unintended matches, the extra slash is used for prefix matching as before. The straightforward `replace()` function cannot be used here to avoid accidental matching of `rootpath_old` in the middle of `path_moved`.
+The extra slash ensures accurate prefix matching, avoiding unintended matches. The `replace()` function is not used to prevent incorrect substitutions of `rootpath_old` in the middle of `path_moved`.
 
-**`subtrees_new_base`** and **`subtrees_path`** perform basic filtering and generate the new `name` and `parent_path`. The line
+##### **Handling Collisions**
+
+The **`subtrees_new_base`** and **`subtrees_path`** CTEs perform filtering and generate the `name` and `parent_path` for new categories. The following line assigns priority to each `path_old` based on its sorted position:
 
 ```sql
 (row_number() OVER (ORDER BY path_old)) AS priority
 ```
 
-is necessary to label each `path_old` according to its position in the sorted list. This labeling is necessary to avoid update issues when processing operations involving colliding categories caused by interaction of implicit cascading updates and collisions inside the affected categories list.
+This priority ensures proper processing of operations involving colliding categories, accounting for cascading updates and internal collisions in the affected category list.
 
-**`new_paths`** labels colliding categories. It also ensures that if some subtrees from the affected categories list collide, the preserved categories come from the same subtree.
+The **`new_paths`** CTE identifies colliding categories, ensuring that preserved categories originate from the same subtree when internal collisions occur.
 
-The trigger code below first updates categories that do not cause name collisions. For these categories, item associations do not to be updated. Then the code updates item associations for colliding categories to be deleted. When both colliding categories have the same items, updating of the `items_categories` table causes associated primary key violations, but these violations are correctly handled automatically by the `ON CONFLICT REPLACE` clause. Finally, the trigger code deletes the source colliding categories.
+##### **Trigger Code**
+
+The trigger code executes in the following sequence:
+1. **Update Non-Colliding Categories**: Categories without name collisions are updated first. Item associations for these categories remain unaffected.
+2. **Handle Colliding Categories**: Item associations for categories to be deleted are updated. When both colliding categories share the same items, primary key violations in the `items_categories` table are handled automatically by the `ON CONFLICT REPLACE` clause.
+3. **Delete Colliding Categories**: Finally, the source colliding categories are removed.
+
+This approach ensures consistent and efficient processing of compound move operations while handling potential collisions and maintaining data integrity.
+
 #### Trigger
 
 ```sql
