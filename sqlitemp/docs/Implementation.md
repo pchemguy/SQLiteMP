@@ -1338,10 +1338,6 @@ FROM new_paths
 ORDER BY target_exists, path_old;
 ```
 
-Here’s a revised version of your text:
-
----
-
 #### **Code Walkthrough**
 
 The current implementation supports a *compound* move operation, where multiple categories can be moved sequentially. This makes the associated code relatively complex. In practice, each "atomic" operation can be persisted by the application individually, even when multiple nodes are being moved. Code for persisting a single move/copy operation is significantly simpler. The primary motivations for implementing the code presented here were to test the feasibility of such an approach and to practice SQL coding.
