@@ -466,3 +466,4 @@ SELECT * FROM json_ops;
 <!-- References -->
 
 [StoredCode]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/StoredCode.md
+[SELECT]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopSELECT.md
