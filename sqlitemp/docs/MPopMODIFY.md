@@ -186,7 +186,7 @@ Only categories with a `path_old` prefix in their `path` field are affected by t
 
 #### **`LOOP_MOVE`**
 
-The **`LOOP_MOVE`** CTE is recursive and the most complex component of this implementation (see also this [RCTE tutorial][rec-cte]). It sequentially applies all requested move operations to the prepared set of affected nodes. Intermediate states of the category tree and item associations are ignored, as only the final new path for each category is required to update the target database tables correctly.
+The **`LOOP_MOVE`** CTE is recursive and represents the most complex component of this implementation (refer to this [RCTE tutorial][rec-cte]). The non-recursive (initialization) `SELECT` populates the recursive buffer/queue with all rows from **`subtrees_old`**. The recursive `SELECT` then sequentially applies each requested move operation to the prepared set of affected nodes. Intermediate states of the category tree and item associations are disregarded, as only the final new path `path_moved` for each category is necessary to correctly update the target database tables.
 
 Key logic in **`LOOP_MOVE`**:
 
@@ -406,7 +406,7 @@ WITH RECURSIVE
     ------------------------- ASCII ID GENERATOR -------------------------
     -- IMPORTANT: This code generates pseudorandom id's but it does not check for potential collisions.
     ---------------------------------------------------------------------------------------------------
-    id_counts(id_counter) AS (SELECT count(*) FROM new_paths),
+    id_counts(id_counter) AS (SELECT count(new_paths.counter) FROM new_paths),
     json_templates AS (SELECT '[' || replace(hex(zeroblob(id_counter*8/2-1)), '0', '0,') || '0,0]' AS json_template FROM id_counts),
     char_templates(char_template) AS (VALUES ('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzAa')),
     ascii_ids AS (
@@ -436,23 +436,95 @@ SELECT * FROM target_nodes
 ORDER BY (NOT id IS NULL), path;
 ```
 
-### Code Walkthrough
+### **Code Walkthrough**
 
-The current implementation supports a *compound* copy operation, where multiple categories can be copied sequentially, making the associated code relatively complex. In practice, each "atomic" operation can be persisted by the application individually, even when multiple nodes are being moved. Code for persisting a single move/copy operation is simpler. The primary motivations for implementing the code presented here were to test the feasibility of such an approach and to practice SQL coding.
+The current implementation supports a *compound* copy operation, where multiple categories can be copied sequentially. This adds complexity to the associated code. In practice, each "atomic" operation can be handled individually by the application, even when multiple nodes are copied. Implementing a single move/copy operation is simpler. The primary objectives of this implementation were to test the feasibility of such an approach and to practice advanced SQL coding techniques.
 
-The input format and behavior of the first two CTEs **`json_ops`** and **`base_ops`** are the same as for the move operation.
+The input format and behavior of the first two CTEs, **`json_ops`** and **`base_ops`**, remain the same as for the move operation.
 
-#### Copy Operation Behavior
+---
 
-The copy operation never deletes categories. When the destination path does not exist, new categories are created; otherwise nothing is done. For new categories, item associations
+#### **Copy Operation Behavior**
 
- **`subtrees_old`**
-The only difference from the `move` operation is the additional included field `src_path`. This field labels each source category and is passed on to generated copies in the `LOOP_COPY` block. This information is necessary to track and process item association information.
+The copy operation differs from the move operation in that it never deletes categories. If the destination path does not exist, new categories are created; otherwise, no changes are made. For newly created categories, item associations are duplicated from their source categories.
 
-#### **`LOOP_MOVE`**
+`subtrees_old` adds the `src_path` field (compared to the move operation). This field labels each source category and is passed on to the generated copies in the **`LOOP_COPY`** CTE. It is essential for tracking and processing item association information during the copy process.
 
+---
+
+#### **`LOOP_COPY`**
+
+The **`LOOP_COPY`** recursive CTE is more elaborate than the move loop. It pulls rows from the `base_ops` and `subtrees_old` CTEs, processing them sequentially. The `base_ops` and `subtrees_old` outputs may look like this:
+
+**`base_ops`**
+
+| opid | rootpath_old                 | rootpath_new                 |
+|:----:|------------------------------|------------------------------|
+|  1   | /copyA                       | /copyB                       |
+|  2   | /copyBAZ/bld/tcl/tests/safe00| /copysafe00                  |
+|  3   | /copysafe00                  | /copysafe                    |
+|  4   | /copyBAZ/dev/msys2           | /copyBAZ/dev/msys            |
+
+**`subtrees_old`**
+
+| opid | path_old                                     |
+| :--: | -------------------------------------------- |
+|  1   | /copyA                                       |
+|  2   | /copyBAZ/bld/tcl/tests/safe00/ssub00         |
+|  2   | /copyBAZ/bld/tcl/tests/safe00/ssub00/modules |
+|  4   | /copyBAZ/dev/msys2                           |
+|  4   | /copyBAZ/dev/msys2/clang32                   |
+
+These tables show, for example, that operation #1 processes `/copyA => /copyB` (the row in the `base_ops` table where `opid` = 1), and the only existing category matching the source path for operation #1 is `/copyA` (the rows in the `subtrees_old` table where `opid` = 1).
+
+---
+
+Think of `LOOP_COPY` as a "for" loop, where the iteration variable is `opid`, defined on the recursive buffer table. At initialization, the non-recursive `SELECT` inserts a single dummy row into the recursive buffer table:
+
+```sql
+SELECT 0 AS opid, NULL AS path_new, NULL AS src_path, json('[]') AS oplog
+```
+
+The loop body has three `SELECT` blocks:
+
+1. **Carry Forward Rows**: Copies all rows from the previous iteration into the buffer table with `opid` incremented. This step ensures that categories created in earlier steps are available for subsequent operations.
+2. **Load Source Categories**: Selects categories matching the source path of the current operation (`path_old`). The query includes a filter to avoid redundant joins:
+   ```sql
+   WHERE lc.path_new IS NULL
+   ```
+   This filter ensures that only the initialization row is used to extract `opid`, improving performance.
+3. **Apply Copy Operation**: Processes the copy operation for all rows produced in the previous cycle, generating new paths.
+
+Recursion terminates when the `opid` exceeds the maximum in **`base_ops.opid`**.
+
+---
+
+#### Postprocessing and Collision Handling
+
+- **`truncated_src_path`**: Extracts results from the final `LOOP_COPY` iteration, discarding the dummy row.
+- **`truncated`**: Retrieves and formats item associations for each row as JSON arrays.
+- **`subtrees_path`**: Handles collisions by grouping rows with the same destination path (`path_new`) and merging item association lists into valid JSON arrays.
+- **`collisions`**: Labels rows where `path_new` matches existing categories.
+- **`subtrees_names`**: Extracts category names from `path_new`.
+- **`new_paths`**: Generates `prefix_new` (the `parent_path` field).
+- **`target_nodes`**: Produces the final output by joining data with the ASCII ID generator prepared `ids` CTE output.
+
+---
+
+#### Trigger Code
+
+The trigger code follows a two-step sequence:
+
+1. **Create New Categories**: Creates categories without name collisions first (nothing is to be done for colliding targets).
+2. **Update Association Table**: Adds item association records for the newly created categories. The `ON CONFLICT REPLACE` clause ensures any conflicts are resolved automatically, eliminating the need to filter out existing records explicitly.
 
 ### Trigger
+
+```sql
+-- Copies categories
+
+```
+
 ### Dummy data
 
 ```sql
