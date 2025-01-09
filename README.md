@@ -6,6 +6,9 @@
 
 - **Hierarchical Category Model**: Manages category systems with single-parent tree categories.
 - **Flexible Item Association**: Associates items with multiple categories, enabling more versatile data organization.
+- **Referential Integrity**: Incorporates foreign keys to ensure consistency of the hierarchy structure and item association data.
+- **Cascading Foreign Keys**: Leverages cascading rules to streamline hierarchy management and ensure referential integrity.
+- **Conflict Resolution Clause**: Simplifies operations involving complex SQL logic (e.g., tree move or copy)
 - **Common Materialized Paths Operations**: Supports creation, deletion, movement, copying, importing, and exporting.
 - **JSON-Based API**: Offers a minimalistic SQL interface for seamless interaction.
 - **Encapsulated SQL Logic**: Improves modularity and reduces code coupling by embedding SQL logic within database views and triggers.
