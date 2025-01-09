@@ -8,7 +8,8 @@ Each hierarchy operation may have an associated a view and trigger.
 | <center>Group</center> | <center>Operation</center> | <center>`op_name`</center> | <center>Description</center>                                                                                                                              |
 | ---------------------- | -------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | MODIFY                 | Move item associations     | `mv_item_cat`              | Given a set of items, and source and destination categories, replace item associations from source to destination (other associations remain unaffected). |
-| MODIFY                 | Move tree                  | `mv_tree`                  | Given a set of categories and associated new paths, move subtrees and update related item associations.                                                   |
+| MODIFY                 | Move trees                 | `mv_tree`                  | Given a set of categories and associated new paths, move subtrees and update related item associations.                                                   |
+| MODIFY                 | Copy trees                 | `cp_tree`                  | Given a set of categories and associated new paths, copy subtrees and update related item associations.                                                   |
 
 
 ---
@@ -90,7 +91,7 @@ SELECT * FROM json_ops;
 ```
 
 
-## Move Tree - `mv_tree`
+## Move Trees - `mv_tree`
 
 Given a set of categories and associated new paths, move subtrees and update related item associations.
 
@@ -301,8 +302,16 @@ SELECT * FROM json_ops;
 
 
 
+---
+
+| [**<= DELETE Operations**][DELETE] | [**Next: DELETE Operations =>**][DELETE] |
+| ---------------------------------- | ---------------------------------------- |
 
 
+<!-- References -->
+
+[DELETE]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopDELETE.md
+[rec-cte]: https://pchemguy.github.io/SQLite-SQL-Tutorial/patterns/rec-cte
 
 
 
