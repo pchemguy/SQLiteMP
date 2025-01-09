@@ -1,18 +1,22 @@
 # CREATE Operations
 
+## Summary
+
 Each hierarchy operation may have an associated a view and trigger.
 
-| Group  | Operation             | `op_name`         |
-| ------ | --------------------- | ----------------- |
-| CREATE | Categories            | `new_cat`         |
-| CREATE | Items                 | `new_item`        |
-| CREATE | Item associations     | `new_item_cat`    |
-| CREATE | *Import (everything)* | *not implemented* |
+| <center>Group</center> | <center>Operation</center> | <center>`op_name`</center> | <center>Description</center>                                                                                                         |
+| ---------------------- | -------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| CREATE                 | Categories                 | `new_cat`                  | Given a set of paths, create all necessary categories.                                                                               |
+| CREATE                 | Items                      | `new_item`                 | Given a set of items, add them to the `items` table.                                                                                 |
+| CREATE                 | Item associations          | `new_item_cat`             | Given a set of item associations, add information to the association table.                                                          |
+| CREATE                 | *Import (everything)*      | *not implemented*          | Given a JSON object containing a complete set of records (`items`, `categories`, `items_categories`), import data into the database. |
 
 ---
 ---
 
 ## Categories - `new_cat`
+
+Given a set of paths, create all necessary categories.
 
 ### View
 
@@ -186,6 +190,8 @@ SELECT * FROM json_ops;
 
 ## Items - `new_item`
 
+Given a set of items, add them to the `items` table.
+
 ### View
 
 ```sql
@@ -298,6 +304,8 @@ SELECT * FROM json_ops;
 
 
 ## Item Associations - `new_item_cat`
+
+Given a set of item associations, add information to the association table.
 
 ### View
 
@@ -442,7 +450,7 @@ SELECT * FROM json_ops;
 
 ## Import
 
-A JSON containing a complete set of records (`items`, `categories`, `items_categories`) may be imported via individual handlers by taking advantage of recursive triggers. This idea is presently not implemented however. 
+A JSON object containing a complete set of records (`items`, `categories`, `items_categories`) may be imported via individual handlers by taking advantage of recursive triggers. This idea is presently not implemented however. 
 
 
 ---
