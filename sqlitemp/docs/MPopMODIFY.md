@@ -92,6 +92,8 @@ SELECT * FROM json_ops;
 
 ## Move Tree - `mv_tree`
 
+Given a set of categories and associated new paths, move subtrees and update related item associations.
+
 ### View
 
 ```sql
