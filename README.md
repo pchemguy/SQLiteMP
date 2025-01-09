@@ -1,4 +1,4 @@
-# Management of Hierarchical Category Systems in SQLite
+# Managing Hierarchical Category Systems in SQLite
 
 **SQLiteMP** is a proof-of-concept SQL implementation of the materialized paths (MPs) tree model, embedded within an SQLite database.
 
