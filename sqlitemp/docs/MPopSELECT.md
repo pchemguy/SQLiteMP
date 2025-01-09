@@ -1,21 +1,25 @@
 # SELECT Operations
 
+## Summary
+
 Each hierarchy operation may have an associated a view and trigger.
 
-| Group  | Operation                      | `op_name`            |
-| ------ | ------------------------------ | -------------------- |
-| SELECT | Descendant categories          | `ls_cat_desc`        |
-| SELECT | Child categories               | `ls_cat_child`       |
-| SELECT | Descendant items               | `ls_item_desc`       |
-| SELECT | Child items                    | `ls_item_child`      |
-| SELECT | Item associations              | `ls_item_cat`        |
-| SELECT | Item association counts        | `cnt_item_cat`       |
-| SELECT | Child items association counts | `cnt_item_child_cat` |
+| <center>Group</center> | <center>Operation</center>     | <center>`op_name`</center> | <center>Description</center>                                                            |
+| ---------------------- | ------------------------------ | -------------------------- | --------------------------------------------------------------------------------------- |
+| SELECT                 | Descendant categories          | `ls_cat_desc`              | Given a set of categories, retrieve the set of descendant categories.                   |
+| SELECT                 | Child categories               | `ls_cat_child`             | Given a set of categories, retrieve the set of child categories.                        |
+| SELECT                 | Descendant items               | `ls_item_desc`             | Given a set of categories, retrieve the set of items associated with subtrees.          |
+| SELECT                 | Child items                    | `ls_item_child`            | Given a set of categories, retrieve the set of directly associated items.               |
+| SELECT                 | Item associations              | `ls_item_cat`              | Given an item, retrieve the set of associated categories.                               |
+| SELECT                 | Item association counts        | `cnt_item_cat`             | Given a set of items, retrieve the number of categories associated with each item.      |
+| SELECT                 | Child items association counts | `cnt_item_child_cat`       | Given a category, retrieve *item association counts* for all directly associated items. |
 
 ---
 ---
 
 ## Descendant Categories - `ls_cat_desc`
+
+Given a set of categories, retrieve the set of descendant categories.
 
 ### View
 
@@ -84,6 +88,8 @@ SELECT * FROM json_ops;
 
 ## Child Categories - `ls_cat_child`
 
+Given a set of categories, retrieve the set of child categories.
+
 ### View
 
 ```sql
@@ -150,6 +156,8 @@ SELECT * FROM json_ops;
 ```
 
 ## Descendant Items - `ls_item_desc`
+
+Given a set of categories, retrieve the set of items associated with subtrees.
 
 ### View
 
@@ -220,6 +228,8 @@ SELECT * FROM json_ops;
 
 ## Child Items - `ls_item_desc`
 
+Given a set of categories, retrieve the set of directly associated items.
+
 ### View
 
 ```sql
@@ -289,6 +299,8 @@ SELECT * FROM json_ops;
 
 ## Item Associations - `ls_item_cat`
 
+Given an item, retrieve the set of associated categories.
+
 ### View
 
 ```sql
@@ -356,6 +368,8 @@ SELECT * FROM json_ops;
 
 ## Item Association Counts - `cnt_item_cat`
 
+Given a set of items, retrieve the number of categories associated with each item
+
 ### View
 
 ```sql
@@ -408,6 +422,8 @@ SELECT * FROM json_ops;
 ```
 
 ## Child Items  Association Counts - `cnt_item_child_cat`
+
+Given a category, retrieve *item association counts* for all directly associated items.
 
 ### View
 
