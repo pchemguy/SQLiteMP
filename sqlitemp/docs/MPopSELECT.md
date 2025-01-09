@@ -50,6 +50,24 @@ SELECT * FROM nodes
 ORDER BY path;
 ```
 
+Note the use of an additional path separator to ensure accurate matches:
+
+```sql
+WHERE path_old || '/' LIKE rootpath_old || '/%'
+```
+
+For example, consider the following list of categories:
+
+```json
+[
+    "/food/cheese",
+    "/food/cheese/blue",
+    "/food/cheeseburger"
+]
+```
+
+Without the extra path separator, `path_old` = `/food/cheese` would incorrectly match all three categories. Adding the separator ensures that only the first two categories are matched as intended.
+
 ### Trigger
 
 ```sql

@@ -187,7 +187,6 @@ INSERT INTO hierarchy_ops(op_name, json_op)
 SELECT * FROM json_ops;
 ```
 
-
 ## Items - `new_item`
 
 Given a set of items, add them to the `items` table.
@@ -301,7 +300,6 @@ WITH
 INSERT INTO hierarchy_ops(op_name, json_op)
 SELECT * FROM json_ops;
 ```
-
 
 ## Item Associations - `new_item_cat`
 

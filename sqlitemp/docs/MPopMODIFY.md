@@ -90,7 +90,6 @@ INSERT INTO hierarchy_ops(op_name, json_op)
 SELECT * FROM json_ops;
 ```
 
-
 ## Move Trees - `mv_tree`
 
 Given a set of categories and associated new paths, move subtrees and update related item associations.
@@ -168,9 +167,9 @@ FROM new_paths
 ORDER BY target_exists, path_old;
 ```
 
-### **Code Walkthrough**
+### Code Walkthrough
 
-The current implementation supports a *compound* move operation, where multiple categories can be moved sequentially. This makes the associated code relatively complex. In practice, each "atomic" operation can be persisted by the application individually, even when multiple nodes are being moved. Code for persisting a single move/copy operation is significantly simpler. The primary motivations for implementing the code presented here were to test the feasibility of such an approach and to practice SQL coding.
+The current implementation supports a *compound* move operation, where multiple categories can be moved sequentially, making the associated code relatively complex. In practice, each "atomic" operation can be persisted by the application individually, even when multiple nodes are being moved. Code for persisting a single move/copy operation is simpler. The primary motivations for implementing the code presented here were to test the feasibility of such an approach and to practice SQL coding.
 
 The **`json_ops`** and **`base_ops`** Common Table Expressions (CTEs) unpack JSON-formatted input (refer to the **Dummy Data** section below) into a table, where each row describes a single operation as a combination of **`path_old`** and **`path_new`** values. Additionally, the **`base_ops`** CTE performs basic path normalization by trimming leading and trailing slashes, if present, and adding a leading slash:
 
@@ -178,28 +177,12 @@ The **`json_ops`** and **`base_ops`** Common Table Expressions (CTEs) unpack JSO
 '/' || trim(json_extract(value, '$.path_old'), '/')
 ```
 
-#### **Move Operation Behavior**
+#### Move Operation Behavior
 
 The move operation cannot create new categories, unlike the copy operation. When a category is moved, its `parent_path` and/or `name` fields need to be updated, along with the `parent_path` fields of its descendants. Although the foreign key on `parent_path` is set for cascading updates, the current implementation explicitly updates all affected categories to address potential name collisions. There is potential for optimization to reduce redundant updates to descendant categories. In cases of name collisions, the move operation deletes the category being moved and merges its item associations with the existing destination category, following the "*keep existing destination*" convention.
 
  **`subtrees_old`**
-Only categories with a `path_old` prefix in their `path` field are affected by the move operation. For compound moves, earlier operations may affect subsequent operations. Consequently, the selection of all categories with prefixes matching any `path_old` constitutes the complete set of "affected" categories. Existing categories are not directly modified due to the "*keep existing destination*" rule. The **`subtrees_old`** CTE generates this list of affected categories. Note the use of an additional path separator to ensure accurate matches:
-
-```sql
-WHERE path_old || '/' LIKE rootpath_old || '/%'
-```
-
-For example, consider the following categories:
-
-```json
-[
-    "/food/cheese",
-    "/food/cheese/blue",
-    "/food/cheeseburger"
-]
-```
-
-Without the extra path separator, `path_old` = `/food/cheese` would incorrectly match all three categories. Adding the separator ensures that only the first two categories are matched as intended.
+Only categories with a `path_old` prefix in their `path` field are affected by the move operation. For compound moves, earlier operations may affect subsequent operations. Consequently, the selection of all categories with prefixes matching any `path_old` constitutes the complete set of "affected" categories. Existing categories are not directly modified due to the "*keep existing destination*" rule. The **`subtrees_old`** CTE generates this list of affected categories. 
 
 #### **`LOOP_MOVE`**
 
@@ -215,7 +198,7 @@ iif(lp.path_moved || '/' NOT LIKE ops.rootpath_old || '/%', lp.path_moved,
 
 The extra slash ensures accurate prefix matching, avoiding unintended matches. The `replace()` function is not used to prevent incorrect substitutions of `rootpath_old` in the middle of `path_moved`.
 
-#### **Handling Collisions**
+#### Handling Collisions
 
 The **`subtrees_new_base`** and **`subtrees_path`** CTEs perform filtering and generate the `name` and `parent_path` for new categories. The following line assigns priority to each `path_old` based on its sorted position:
 
@@ -227,7 +210,7 @@ This priority ensures proper processing of operations involving colliding catego
 
 The **`new_paths`** CTE identifies colliding categories, ensuring that preserved categories originate from the same subtree when internal collisions occur.
 
-#### **Trigger Code**
+#### Trigger Code
 
 The trigger code executes in the following sequence:
 1. **Update Non-Colliding Categories**: Categories without name collisions are updated first. Item associations for these categories remain unaffected.
@@ -305,7 +288,7 @@ Given a set of categories and associated new paths, copy subtrees and update rel
 ```sql
 -- Prepares the list of categories to be copied
 DROP VIEW IF EXISTS "cp_tree";
-CREATE VIEW "copy_tree" AS
+CREATE VIEW "cp_tree" AS
 WITH RECURSIVE
     ------------------------------ PROLOGUE ------------------------------
     json_ops AS (
@@ -441,6 +424,14 @@ WITH RECURSIVE
     )
 SELECT * FROM target_nodes;
 ```
+
+### Code Walkthrough
+
+The current implementation supports a *compound* copy operation, where multiple categories can be copied sequentially, making the associated code relatively complex. In practice, each "atomic" operation can be persisted by the application individually, even when multiple nodes are being moved. Code for persisting a single move/copy operation is simpler. The primary motivations for implementing the code presented here were to test the feasibility of such an approach and to practice SQL coding.
+
+The input format and behavior of the first two CTEs **`json_ops`** and **`base_ops`** are the same as for the move operation.
+
+#### Copy Operation Behavior
 
 ### Trigger
 ### Dummy data
