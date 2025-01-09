@@ -301,8 +301,42 @@ SELECT * FROM json_ops;
 Given a set of categories and associated new paths, copy subtrees and update related item associations.
 
 ### View
+
+```sql
+-- Prepares the list of categories to be copied
+DROP VIEW IF EXISTS "cp_tree";
+CREATE VIEW "copy_tree" AS
+```
+
 ### Trigger
 ### Dummy data
+
+```sql
+-- Data for tree copy
+WITH
+    json_ops(op_name, json_op) AS (
+        VALUES
+            ('copy', json('[
+                {"path_old":"/copyBAZ/bld/booze/safe00",     "path_new":"/copybbbbbb"},
+                {"path_old":"/copyBAZ/bld/tcl/tests/safe00", "path_new":"/copysafe00"},
+                {"path_old":"/copysafe00",                   "path_new":"/copysafe"},
+                {"path_old":"/copyBAZ/dev/msys2",            "path_new":"/copyBAZ/dev/msys"},
+                {"path_old":"/copyBAZ/bld/tcl/tests/preEEE", "path_new":"/copypreEEE"},
+                {"path_old":"/copysafe/modules",             "path_new":"/copysafe/modu"},
+                {"path_old":"/copysafe/modu/mod2",           "path_new":"/copysafe/modu/mod3"},
+                {"path_old":"/copyBAZ/bld/tcl/tests/ssub00", "path_new":"/copysafe/ssub00"},
+                {"path_old":"/copyBAZ/dev/msys/mingw32",     "path_new":"/copyBAZ/dev/msys/nix"},
+                {"path_old":"/copysafe/ssub00/modules",      "path_new":"/copysafe/modules"},
+                {"path_old":"/copyBAZ/bld/tcl/tests/manYYY", "path_new":"/copyman000"},
+                {"path_old":"/copyBAZ/dev/msys/nix/etc",     "path_new":"/copyBAZ/dev/msys/nix/misc"},
+                {"path_old":"/copyBAZ/bld/tcl/tests/manZZZ", "path_new":"/copyBAZ/bld/tcl/tests/man000"},
+                {"path_old":"/copyBAZ/bld/tcl/tests/man000", "path_new":"/copyman000"},
+                {"path_old":"/copyBAZ/bld/tcl/tests/safe11", "path_new":"/copysafe11"},
+            ]'))
+    )
+INSERT INTO hierarchy_ops(op_name, json_op)
+SELECT * FROM json_ops;
+```
 
 ---
 
