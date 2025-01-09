@@ -308,49 +308,59 @@ WITH RECURSIVE
     /********************************************************************/
     --------------------------- SUBTREES LIST ----------------------------
     subtrees_old AS (
-        SELECT opid, path AS path_old, json_group_array(item_handle) AS item_handles
-        FROM base_ops, categories, items_categories
-        WHERE path_old || '/' LIKE rootpath_old || '/%'
-          AND path_old = cat_path
-        GROUP BY path_old
-        ORDER BY opid, path_old
+        SELECT ops.opid, c.path AS path_old, c.path AS src_path
+        FROM base_ops AS ops, categories AS c
+        WHERE path_old || '/' LIKE ops.rootpath_old || '/%'
+        GROUP BY ops.opid, path_old
+        ORDER BY ops.opid, path_old
     ),
     /********************************************************************/
     ----------------------------- COPY LOOP ------------------------------
     LOOP_COPY AS (
-            SELECT 0 AS opid, NULL AS path_new, NULL AS item_handles, json('[]') AS oplog
+            SELECT 0 AS opid, NULL AS path_new, NULL AS src_path, json('[]') AS oplog
         UNION ALL
-            SELECT ops.opid, path_new, item_handles, oplog
-            FROM LOOP_COPY AS BUFFER, base_ops AS ops
-            WHERE ops.opid = BUFFER.opid + 1
-        UNION ALL
-            SELECT
-                ops.opid,
-                rootpath_new || substr(path_old, length(rootpath_old) + 1) AS path_new,
-                subtrees_old.item_handles,
-                json_set(oplog, '$[#]', ops.opid) AS oplog
-            FROM LOOP_COPY AS BUFFER, base_ops AS ops, subtrees_old
-            WHERE BUFFER.path_new IS NULL
-              AND ops.opid = BUFFER.opid + 1
-              AND subtrees_old.opid = BUFFER.opid + 1
+            SELECT ops.opid, lc.path_new, lc.src_path, lc.oplog
+            FROM LOOP_COPY AS lc, base_ops AS ops
+            WHERE ops.opid = lc.opid + 1
         UNION ALL
             SELECT
                 ops.opid,
-                rootpath_new || substr(path_new, length(rootpath_old) + 1) AS path_new,
-                item_handles,
-                json_set(oplog, '$[#]', ops.opid) AS oplog
-            FROM LOOP_COPY AS BUFFER, base_ops AS ops
-            WHERE ops.opid = BUFFER.opid + 1
-              AND BUFFER.path_new || '/' LIKE rootpath_old || '/%'
+                ops.rootpath_new || substr(so.path_old, length(ops.rootpath_old) + 1) AS path_new,
+				so.src_path,
+                json_set(lc.oplog, '$[#]', ops.opid) AS oplog
+            FROM LOOP_COPY AS lc, base_ops AS ops, subtrees_old AS so
+            WHERE lc.path_new IS NULL
+              AND ops.opid = lc.opid + 1
+              AND so.opid = lc.opid + 1
+        UNION ALL
+            SELECT
+                ops.opid,
+                ops.rootpath_new || substr(lc.path_new, length(ops.rootpath_old) + 1) AS path_new,
+				lc.src_path,
+                json_set(lc.oplog, '$[#]', ops.opid) AS oplog
+            FROM LOOP_COPY AS lc, base_ops AS ops
+            WHERE ops.opid = lc.opid + 1
+              AND lc.path_new || '/' LIKE ops.rootpath_old || '/%'
     ),
     /********************************************************************/
-    truncated AS (
-        SELECT opid, NULL AS ascii_id, path_new, item_handles, oplog
+    truncated_src_path AS (
+        SELECT opid, path_new, src_path, oplog
         FROM LOOP_COPY
         WHERE NOT path_new IS NULL
           AND opid = (SELECT max(opid) FROM base_ops)
         ORDER BY path_new
     ),
+    truncated AS (
+        SELECT
+			tsp.opid,
+			NULL AS ascii_id,
+			tsp.path_new,
+			json_group_array(ic.item_handle ORDER BY ic.item_handle) AS item_handles,
+			tsp.oplog
+		FROM truncated_src_path  AS tsp, items_categories AS ic
+		WHERE tsp.src_path = ic.cat_path
+		GROUP BY tsp.path_new, tsp.src_path
+	),
     subtrees_path AS (
         SELECT
             group_concat(ascii_id) AS ascii_id,
@@ -422,7 +432,8 @@ WITH RECURSIVE
         FROM new_paths
         LEFT JOIN ids USING (counter)
     )
-SELECT * FROM target_nodes;
+SELECT * FROM target_nodes
+ORDER BY (NOT id IS NULL), path;
 ```
 
 ### Code Walkthrough
@@ -432,6 +443,14 @@ The current implementation supports a *compound* copy operation, where multiple 
 The input format and behavior of the first two CTEs **`json_ops`** and **`base_ops`** are the same as for the move operation.
 
 #### Copy Operation Behavior
+
+The copy operation never deletes categories. When the destination path does not exist, new categories are created; otherwise nothing is done. For new categories, item associations
+
+ **`subtrees_old`**
+The only difference from the `move` operation is the additional included field `src_path`. This field labels each source category and is passed on to generated copies in the `LOOP_COPY` block. This information is necessary to track and process item association information.
+
+#### **`LOOP_MOVE`**
+
 
 ### Trigger
 ### Dummy data
