@@ -300,9 +300,9 @@ SELECT * FROM json_ops;
 
 Given a set of categories and associated new paths, copy subtrees and update related item associations.
 
-
-
-
+### View
+### Trigger
+### Dummy data
 
 ---
 
