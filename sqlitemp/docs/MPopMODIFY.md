@@ -306,6 +306,140 @@ Given a set of categories and associated new paths, copy subtrees and update rel
 -- Prepares the list of categories to be copied
 DROP VIEW IF EXISTS "cp_tree";
 CREATE VIEW "copy_tree" AS
+WITH RECURSIVE
+    ------------------------------ PROLOGUE ------------------------------
+    json_ops AS (
+        SELECT json_op
+        FROM hierarchy_ops
+        WHERE op_name = 'cp_tree'
+        ORDER BY id DESC
+        LIMIT 1
+    ),
+    base_ops AS (
+        SELECT
+            "key" + 1 AS opid,
+            '/' || trim(json_extract(value, '$.path_old'), '/') AS rootpath_old,
+            '/' || trim(json_extract(value, '$.path_new'), '/') AS rootpath_new
+        FROM json_ops AS jo, json_each(jo.json_op) AS terms
+    ),
+    /********************************************************************/
+    --------------------------- SUBTREES LIST ----------------------------
+    subtrees_old AS (
+        SELECT opid, path AS path_old, json_group_array(item_handle) AS item_handles
+        FROM base_ops, categories, items_categories
+        WHERE path_old || '/' LIKE rootpath_old || '/%'
+          AND path_old = cat_path
+        GROUP BY path_old
+        ORDER BY opid, path_old
+    ),
+    /********************************************************************/
+    ----------------------------- COPY LOOP ------------------------------
+    LOOP_COPY AS (
+            SELECT 0 AS opid, NULL AS path_new, NULL AS item_handles, json('[]') AS oplog
+        UNION ALL
+            SELECT ops.opid, path_new, item_handles, oplog
+            FROM LOOP_COPY AS BUFFER, base_ops AS ops
+            WHERE ops.opid = BUFFER.opid + 1
+        UNION ALL
+            SELECT
+                ops.opid,
+                rootpath_new || substr(path_old, length(rootpath_old) + 1) AS path_new,
+                subtrees_old.item_handles,
+                json_set(oplog, '$[#]', ops.opid) AS oplog
+            FROM LOOP_COPY AS BUFFER, base_ops AS ops, subtrees_old
+            WHERE BUFFER.path_new IS NULL
+              AND ops.opid = BUFFER.opid + 1
+              AND subtrees_old.opid = BUFFER.opid + 1
+        UNION ALL
+            SELECT
+                ops.opid,
+                rootpath_new || substr(path_new, length(rootpath_old) + 1) AS path_new,
+                item_handles,
+                json_set(oplog, '$[#]', ops.opid) AS oplog
+            FROM LOOP_COPY AS BUFFER, base_ops AS ops
+            WHERE ops.opid = BUFFER.opid + 1
+              AND BUFFER.path_new || '/' LIKE rootpath_old || '/%'
+    ),
+    /********************************************************************/
+    truncated AS (
+        SELECT opid, NULL AS ascii_id, path_new, item_handles, oplog
+        FROM LOOP_COPY
+        WHERE NOT path_new IS NULL
+          AND opid = (SELECT max(opid) FROM base_ops)
+        ORDER BY path_new
+    ),
+    subtrees_path AS (
+        SELECT
+            group_concat(ascii_id) AS ascii_id,
+            path_new,
+            replace(group_concat(iif(item_handles <> '[]', item_handles, NULL), ''), '][', ',') AS item_handles,
+            replace(group_concat(iif(oplog <> '[]', oplog, NULL), ''), '][', ',') AS oplog
+        FROM truncated
+        GROUP BY path_new
+        ORDER BY path_new
+    ),
+    collisions AS (
+        SELECT categories.ascii_id, path_new, item_handles
+        FROM subtrees_path
+        LEFT JOIN categories ON path_new = path
+    ),
+    subtrees_names AS (
+        SELECT
+            ascii_id,
+            json_extract('["' || replace(trim(path_new, '/'), '/', '", "') || '"]', '$[#-1]') AS name_new,
+            path_new,
+            item_handles
+        FROM collisions
+    ),
+    new_paths AS (
+            SELECT
+                NULL counter, ascii_id, NULL AS prefix_new, NULL AS name_new, path_new, item_handles
+            FROM subtrees_names
+            WHERE NOT ascii_id IS NULL
+        UNION ALL
+            SELECT
+                row_number() OVER (ORDER BY path_new) - 1 AS counter,
+                ascii_id,
+                iif(length(path_new) - length(name_new) - 1 > 0,
+                    substr(path_new, 1, length(path_new) - length(name_new) - 1),
+                    NULL
+                ) AS prefix_new,
+                name_new,
+                path_new,
+                item_handles
+            FROM subtrees_names
+            WHERE ascii_id IS NULL
+    ),
+    ------------------------- ASCII ID GENERATOR -------------------------
+    -- IMPORTANT: This code generates pseudorandom id's but it does not check for potential collisions.
+    ---------------------------------------------------------------------------------------------------
+    id_counts(id_counter) AS (SELECT count(*) FROM new_paths),
+    json_templates AS (SELECT '[' || replace(hex(zeroblob(id_counter*8/2-1)), '0', '0,') || '0,0]' AS json_template FROM id_counts),
+    char_templates(char_template) AS (VALUES ('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzAa')),
+    ascii_ids AS (
+        SELECT group_concat(substr(char_template, (random() & 63) + 1, 1), '') AS ascii_id, "key"/8 AS counter
+        FROM char_templates, json_templates, json_each(json_templates.json_template) AS terms
+        GROUP BY counter
+    ),
+    ids AS (
+        SELECT counter, ascii_id,
+               (unicode(substr(ascii_id, 1, 1)) << 8*7) +
+               (unicode(substr(ascii_id, 2, 1)) << 8*6) +
+               (unicode(substr(ascii_id, 3, 1)) << 8*5) +
+               (unicode(substr(ascii_id, 4, 1)) << 8*4) +
+               (unicode(substr(ascii_id, 5, 1)) << 8*3) +
+               (unicode(substr(ascii_id, 6, 1)) << 8*2) +
+               (unicode(substr(ascii_id, 7, 1)) << 8*1) +
+               (unicode(substr(ascii_id, 8, 1)) << 8*0) AS bin_id
+        FROM ascii_ids
+    ),
+    /********************************************************************/
+    target_nodes AS (
+        SELECT bin_id AS id, prefix_new AS prefix, name_new AS name, path_new AS path, item_handles
+        FROM new_paths
+        LEFT JOIN ids USING (counter)
+    )
+SELECT * FROM target_nodes;
 ```
 
 ### Trigger
@@ -316,7 +450,7 @@ CREATE VIEW "copy_tree" AS
 WITH
     json_ops(op_name, json_op) AS (
         VALUES
-            ('copy', json('[
+            ('cp_tree', json('[
                 {"path_old":"/copyBAZ/bld/booze/safe00",     "path_new":"/copybbbbbb"},
                 {"path_old":"/copyBAZ/bld/tcl/tests/safe00", "path_new":"/copysafe00"},
                 {"path_old":"/copysafe00",                   "path_new":"/copysafe"},
