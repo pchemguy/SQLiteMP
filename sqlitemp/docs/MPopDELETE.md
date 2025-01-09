@@ -278,13 +278,13 @@ INSERT INTO hierarchy_ops(op_name, json_op)
 SELECT * FROM json_ops;
 ```
 
-
 ---
 
-| [**<= CREATE Operations**][CREATE] | [**Next: SELECT Operations =>**][SELECT] |
+| [**<= CREATE Operations**][CREATE] | [**Next: MODIFY Operations =>**][MODIFY] |
 | ---------------------------------- | ---------------------------------------- |
 
 
 <!-- References -->
 
 [CREATE]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopCREATE.md
+[MODIFY]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopMODIFY.md
