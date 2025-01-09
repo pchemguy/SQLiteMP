@@ -4,7 +4,6 @@
 
 Each hierarchy operation may have an associated a view and trigger.
 
-
 | <center>Group</center> | <center>Operation</center> | <center>`op_name`</center> | <center>Description</center>                                                             |
 | ---------------------- | -------------------------- | -------------------------- | ---------------------------------------------------------------------------------------- |
 | DELETE                 | Categories                 | `del_cat`                  | Given a set of categories, delete the associated subtrees and related item associations. |
