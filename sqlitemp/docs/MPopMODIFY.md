@@ -522,7 +522,20 @@ The trigger code follows a two-step sequence:
 
 ```sql
 -- Copies categories
-
+DROP TRIGGER IF EXISTS "cp_tree";
+CREATE TRIGGER "cp_tree"
+AFTER INSERT ON "hierarchy_ops"
+FOR EACH ROW
+WHEN NEW."op_name" = 'cp_tree'
+BEGIN
+    INSERT INTO categories(id, name, parent_path)
+    SELECT id, name, prefix AS parent_path FROM cp_tree
+    WHERE NOT name IS NULL;
+    
+    INSERT OR IGNORE INTO items_categories(cat_path, item_handle)
+    SELECT cp_tree.path AS cat_path, assoc.value AS item_handle
+    FROM cp_tree, json_each(item_handles) AS assoc;
+END;
 ```
 
 ### Dummy data
@@ -556,8 +569,8 @@ SELECT * FROM json_ops;
 
 ---
 
-| [**<= DELETE Operations**][DELETE] | [**Next: DELETE Operations =>**][DELETE] |
-| ---------------------------------- | ---------------------------------------- |
+| [**<= DELETE Operations**][DELETE] |
+| ---------------------------------- |
 
 
 <!-- References -->
