@@ -1,19 +1,23 @@
 # DELETE Operations
 
+## Summary
+
 Each hierarchy operation may have an associated a view and trigger.
 
 
-| Group  | Operation               | `op_name`        |
-| ------ | ----------------------- | ---------------- |
-| DELETE | Categories              | `del_cat`        |
-| DELETE | Item associations       | `del_item_cat`   |
-| DELETE | Item associations reset | `reset_item_cat` |
-| DELETE | Items                   | `del_item`       |
+| <center>Group</center> | <center>Operation</center> | <center>`op_name`</center> | <center>Description</center>                                                             |
+| ---------------------- | -------------------------- | -------------------------- | ---------------------------------------------------------------------------------------- |
+| DELETE                 | Categories                 | `del_cat`                  | Given a set of categories, delete the associated subtrees and related item associations. |
+| DELETE                 | Item associations          | `del_item_cat`             | Given a category and a set of associated items, remove items from the category.          |
+| DELETE                 | Item associations reset    | `reset_item_cat`           | Given a set of items, remove all related category associations.                          |
+| DELETE                 | Items                      | `del_item`                 | Given a set of items, delete them.                                                       |
 
 ---
 ---
 
 ## Categories - `del_cat`
+
+Given a set of categories, delete the associated subtrees and related item associations
 
 ### View
 
@@ -54,7 +58,7 @@ BEGIN
 END;
 ```
 
-Cascading foreign keys make sure that category subtrees and related item association are deleted. Items remain otherwise unaffected.
+Cascading foreign keys make sure that category subtrees and related item association are deleted. (Note, the present code with prefix matching explicitly deletes all target categories. It is sufficient to delete just the specified categories by matching their paths exactly.) Items remain otherwise unaffected.
 
 ### Dummy data
 
@@ -79,6 +83,8 @@ SELECT * FROM json_ops;
 
 
 ## Item Associations - `del_item_cat`
+
+Given a category and a set of associated items, remove items from the category
 
 ### View
 
@@ -148,6 +154,8 @@ SELECT * FROM json_ops;
 
 ## Reset Item Associations - `reset_item_cat`
 
+Given a set of items, remove all related category associations.
+
 ### View
 
 ```sql
@@ -208,6 +216,8 @@ SELECT * FROM json_ops;
 ```
 
 ## Delete Items - `del_item`
+
+Given a set of items, delete them.
 
 ### View
 
