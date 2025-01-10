@@ -32,7 +32,7 @@ The minimalistic `items_categories` table includes two fields forming the table 
 
 ## SQL
 
-See the SQL code of the core schema below (and also in the [file][CoreSchema]; [core dummy data][]):
+See the SQL code of the core schema below:
 
 <details>  
 <summary><b>Core schema</b></summary>  
@@ -150,4 +150,3 @@ CREATE TABLE "hierarchy_ops" (
 [CoreSchema]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/src/sqlitemp/sql/core_schema.sql
 [Overview]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Overview.md
 [MPops]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPops.md
-[core dummy data]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/src/sqlitemp/sql/core_schema_dummy_data.sql
