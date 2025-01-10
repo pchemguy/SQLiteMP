@@ -9,6 +9,8 @@
 
 -- ```sql
 -- Prepares the list of target categories
+DROP VIEW IF EXISTS "exp_cat";
+CREATE VIEW "exp_cat" AS
 WITH
     json_ops AS (
         SELECT json_op
