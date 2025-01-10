@@ -97,7 +97,7 @@ DROP TABLE IF EXISTS "hierarchy_ops";
 CREATE TABLE "hierarchy_ops" (
     "id"        INTEGER PRIMARY KEY AUTOINCREMENT,
     "op_name"   TEXT    NOT NULL COLLATE NOCASE,
-    "json_op"   TEXT    NOT NULL COLLATE NOCASE,
+    "json_op"   TEXT    COLLATE NOCASE,
     "payload"   TEXT
 );
 ```
