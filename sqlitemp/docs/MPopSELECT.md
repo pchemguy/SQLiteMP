@@ -259,7 +259,7 @@ WHEN NEW."op_name" = 'ls_item_desc'
 BEGIN
     UPDATE hierarchy_ops SET payload = json_data
     FROM (
-        SELECT json_group_array(path ORDER BY name) AS json_data
+        SELECT json_group_array(handle ORDER BY name) AS json_data
         FROM ls_item_desc
     )
 	WHERE id = NEW.id;
@@ -330,7 +330,7 @@ WHEN NEW."op_name" = 'ls_item_child'
 BEGIN
     UPDATE hierarchy_ops SET payload = json_data
     FROM (
-        SELECT json_group_array(path ORDER BY name) AS json_data
+        SELECT json_group_array(handle ORDER BY name) AS json_data
         FROM ls_item_child
     )
 	WHERE id = NEW.id;
