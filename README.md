@@ -18,6 +18,10 @@
 - **Recursive Triggers for DRY Code**: Facilitates development of complex SQL logic (not yet implemented).
 - **Standard SQLite Compatibility**: Fully implemented using the standard SQLite library.
 
+- **Trigger-based SQL DRYing**: Turns parameterized views into reusable and testable SQL functions
+
+
+
 ---
 
 ## **Codebase**
