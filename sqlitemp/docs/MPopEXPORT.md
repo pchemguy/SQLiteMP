@@ -286,9 +286,10 @@ END;
 
 ---
 
-| [**<= MODIFY Operations**][MODIFY] |
-| ---------------------------------- |
+| [**<= MODIFY Operations**][MODIFY] | [**Next:  Tutorial =>**][Tutorial] |
+| ---------------------------------- | ---------------------------------- |
 
 <!-- References -->
 
 [MODIFY]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopMODIFY.md
+[Tutorial]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Tutorial.md
