@@ -282,14 +282,10 @@ BEGIN
 END;
 ```
 
-
-# Q
-
 ---
 
 | [**<= MODIFY Operations**][MODIFY] |
 | ---------------------------------- |
-
 
 <!-- References -->
 
