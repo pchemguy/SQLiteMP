@@ -42,7 +42,13 @@ SELECT * FROM ids;
 
 The `environment` table mimics the functionality of environment variables. The `ascii_id_generator` view code is adapted from a [previously published snippet][ASCII ID generator] with minor modifications. The number of rows returned by the view is determined by the value of the `environment.value` field where `name` = "ID_COUNTER". By updating this field - for instance, through a basic parameterized `INSERT OR REPLACE` query - you can effectively pass a parameter to the `ascii_id_generator` view, which will then generate and return the specified number of new IDs. This approach can be seamlessly extended to work with triggers as well.
 
+---  
+
+| [**<= Previous: Overview**][Overview] | [**Next: The Core Schema =>**][CoreSchema] |
+| ------------------------------------- | ------------------------------------------ |
 
 <!-- References -->
 
 [ASCII ID generator]: https://pchemguy.github.io/SQLite-SQL-Tutorial/patterns/ascii-id
+[Overview]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Overview.md
+[CoreSchema]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/CoreSchema.md
