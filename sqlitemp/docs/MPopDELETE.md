@@ -248,7 +248,7 @@ FOR EACH ROW
 WHEN NEW."op_name" = 'del_item'
 BEGIN
     DELETE FROM items
-    WHERE item_handle IN (SELECT * FROM del_item);
+    WHERE handle IN (SELECT * FROM del_item);
 END;
 ```
 
