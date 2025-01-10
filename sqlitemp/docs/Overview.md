@@ -8,11 +8,11 @@ Item names are also case-insensitive yet case-preserving but do not form unique 
 
 ---
 
-| [**Next: Pseudo-Parameterized Views and Triggers =>**][ParamViewTrigger] |
-| ------------------------------------------------------------------------ |
+| [**Next: The Core Schema =>**][CoreSchema] |
+| ------------------------------------------ |
 
 
 <!-- References -->
 
 [MP Design Rules]: https://pchemguy.github.io/SQLite-SQL-Tutorial/mat-paths/design-rules
-[ParamViewTrigger]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/ParamViewTrigger.md
+[CoreSchema]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/CoreSchema.md

@@ -44,11 +44,13 @@ The `environment` table mimics the functionality of environment variables. The `
 
 ---  
 
-| [**<= Previous: Overview**][Overview] | [**Next: The Core Schema =>**][CoreSchema] |
-| ------------------------------------- | ------------------------------------------ |
+| [**<= Previous: CREATE Operations**][CREATE] | [**Next: DELETE Operations =>**][DELETE] |
+| -------------------------------------------- | ---------------------------------------- |
+
+
 
 <!-- References -->
 
 [ASCII ID generator]: https://pchemguy.github.io/SQLite-SQL-Tutorial/patterns/ascii-id
-[Overview]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Overview.md
-[CoreSchema]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/CoreSchema.md
+[DELETE]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopDELETE.md
+[CREATE]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopCREATE.md
