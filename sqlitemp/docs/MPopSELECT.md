@@ -8,8 +8,10 @@ Each hierarchy operation may have an associated a view and trigger.
 | ---------------------- | ------------------------------ | -------------------------- | --------------------------------------------------------------------------------------- |
 | SELECT                 | Descendant categories          | `ls_cat_desc`              | Given a set of categories, retrieve the set of descendant categories.                   |
 | SELECT                 | Child categories               | `ls_cat_child`             | Given a set of categories, retrieve the set of child categories.                        |
+| SELECT                 | Empty categories               | `ls_cat_empty`             | Retrieve all empty categories.                                                          |
 | SELECT                 | Descendant items               | `ls_item_desc`             | Given a set of categories, retrieve the set of items associated with subtrees.          |
 | SELECT                 | Child items                    | `ls_item_child`            | Given a set of categories, retrieve the set of directly associated items.               |
+| SELECT                 | Unfiled items                  | `ls_item_unfiled`          | Retrieve all unfiled items.                                                             |
 | SELECT                 | Item associations              | `ls_item_cat`              | Given an item, retrieve the set of associated categories.                               |
 | SELECT                 | Item association counts        | `cnt_item_cat`             | Given a set of items, retrieve the number of categories associated with each item.      |
 | SELECT                 | Child items association counts | `cnt_item_child_cat`       | Given a category, retrieve *item association counts* for all directly associated items. |
@@ -173,6 +175,43 @@ INSERT INTO hierarchy_ops(op_name, json_op)
 SELECT * FROM json_ops;
 ```
 
+## Empty Categories - `ls_cat_empty`
+
+Retrieve all empty categories.
+
+### View
+
+```sql
+-- Retrieves empty categories
+DROP VIEW IF EXISTS "ls_cat_empty";
+CREATE VIEW "ls_cat_empty" AS
+SELECT c.path
+FROM categories AS c
+LEFT JOIN items_categories AS ic
+ON c.path = ic.cat_path
+WHERE ic.cat_path IS NULL
+ORDER BY c.path;
+```
+
+### Trigger
+
+```sql
+-- Retrieves empty categories
+DROP TRIGGER IF EXISTS "ls_cat_empty";
+CREATE TRIGGER "ls_cat_empty"
+AFTER INSERT ON "hierarchy_ops"
+FOR EACH ROW
+WHEN NEW."op_name" = 'ls_cat_empty'
+BEGIN
+    UPDATE hierarchy_ops SET payload = json_data
+    FROM (
+        SELECT json_group_array(path ORDER BY path) AS json_data
+        FROM ls_cat_empty
+    )
+	WHERE id = NEW.id;
+END;
+```
+
 ## Descendant Items - `ls_item_desc`
 
 Given a set of categories, retrieve the set of items associated with subtrees.
@@ -313,6 +352,48 @@ WITH
     )
 INSERT INTO hierarchy_ops(op_name, json_op)
 SELECT * FROM json_ops;
+```
+
+## Unfiled Items - `ls_item_unfiled`
+
+Retrieve all unfiled items.
+
+### View
+
+```sql
+-- Retrieves child items
+DROP VIEW IF EXISTS "ls_item_unfiled";
+CREATE VIEW "ls_item_unfiled" AS
+SELECT
+    json_object(
+        'name', i.name,
+        'handle_type', i.handle_type,
+        'handle', i.handle
+    ) AS item_data
+FROM items AS i
+LEFT JOIN items_categories AS ic
+ON i.handle = ic.item_handle
+WHERE ic.item_handle IS NULL
+ORDER BY i.name;
+```
+
+### Trigger
+
+```sql
+-- Retrieves child items
+DROP TRIGGER IF EXISTS "ls_item_unfiled";
+CREATE TRIGGER "ls_item_unfiled"
+AFTER INSERT ON "hierarchy_ops"
+FOR EACH ROW
+WHEN NEW."op_name" = 'ls_item_unfiled'
+BEGIN
+    UPDATE hierarchy_ops SET payload = json_data
+    FROM (
+        SELECT json_group_array(json(item_data) ORDER BY item_data) AS json_data
+        FROM ls_item_unfiled
+    )
+	WHERE id = NEW.id;
+END;
 ```
 
 ## Item Associations - `ls_item_cat`
