@@ -78,9 +78,6 @@ INSERT INTO hierarchy_ops(op_name, json_op)
 SELECT * FROM json_ops;
 ```
 
-
-
-
 ## Item Associations - `del_item_cat`
 
 Given a category and a set of associated items, remove items from the category
