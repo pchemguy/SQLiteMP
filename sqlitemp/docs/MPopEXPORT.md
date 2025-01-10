@@ -22,6 +22,7 @@ Given a set of categories, export paths for associated trees. If no categories a
 ### View
 
 ```sql
+-- Prepares the list of target categories
 WITH
     json_ops AS (
         SELECT json_op
@@ -92,6 +93,7 @@ Export leaf categories.
 ### View
 
 ```sql
+-- Prepares list of leaf categories
 DROP VIEW IF EXISTS "exp_cat_leaf";
 CREATE VIEW "exp_cat_leaf" AS
 SELECT path
@@ -119,6 +121,39 @@ BEGIN
         SELECT json_group_array(path ORDER BY path) AS json_data
         FROM exp_cat_leaf
     )
+	WHERE id = NEW.id;
+END;
+```
+
+## Items - `exp_item`
+
+Export items.
+
+### View
+
+```sql
+-- Prepares JSON-packed item data
+DROP VIEW IF EXISTS "exp_item";
+CREATE VIEW "exp_item" AS
+SELECT
+	json_group_array(json_object(
+		'name', name, 'handle_type', handle_type, 'handle', handle
+	) ORDER BY name) AS payload
+FROM items;
+```
+
+### Trigger
+
+```sql
+-- Export items
+DROP TRIGGER IF EXISTS "exp_item";
+CREATE TRIGGER "exp_item"
+AFTER INSERT ON "hierarchy_ops"
+FOR EACH ROW
+WHEN NEW."op_name" = 'exp_item'
+BEGIN
+    UPDATE hierarchy_ops SET payload = exp_item.payload
+    FROM exp_item
 	WHERE id = NEW.id;
 END;
 ```
