@@ -162,7 +162,7 @@ END;
 
 ## Item associations - `exp_item_cat`
 
-Export item associations..
+Export item associations.
 
 ### View
 
@@ -201,7 +201,7 @@ END;
 
 ## Core data - `exp_core`
 
-Export categories, items, an associations
+Export categories, items, an associations.
 
 ### View
 
