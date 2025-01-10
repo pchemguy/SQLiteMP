@@ -493,11 +493,11 @@ SELECT * FROM json_ops;
 
 ---
 
-| [**<= Previous: Storing Code in an SQLite Database**][StoredCode] | [**Next:  CREATE Operations=>**][CREATE] |
-| ----------------------------------------------------------------- | ---------------------------------------- |
+| [**<= Previous: Pseudo-Parameterized Views and Triggers**][ParamViewTrigger] | [**Next:  CREATE Operations=>**][CREATE] |
+| ---------------------------------------------------------------------------- | ---------------------------------------- |
 
 
 <!-- References -->
 
-[StoredCode]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/StoredCode.md
+[ParamViewTrigger]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/ParamViewTrigger.md
 [CREATE]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopCREATE.md

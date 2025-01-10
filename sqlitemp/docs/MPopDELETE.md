@@ -279,11 +279,11 @@ SELECT * FROM json_ops;
 
 ---
 
-| [**<= Previous: Pseudo-Parameterized Views and Triggers**][ParamViewTrigger] | [**Next: MODIFY Operations =>**][MODIFY] |
-| ---------------------------------------------------------------------------- | ---------------------------------------- |
+| [**<= Previous: CREATE Operations**][CREATE] | [**Next: MODIFY Operations =>**][MODIFY] |
+| -------------------------------------------- | ---------------------------------------- |
 
 
 <!-- References -->
 
-[ParamViewTrigger]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/ParamViewTrigger.md
+[CREATE]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopCREATE.md
 [MODIFY]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopMODIFY.md

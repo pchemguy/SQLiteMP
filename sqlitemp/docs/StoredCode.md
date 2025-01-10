@@ -197,11 +197,11 @@ An additional advantage of this approach is that it ensures associated triggers 
 
 ---
 
-| [**<= Materialized path operations**][MPops] | [**Next: SELECT Operations =>**][SELECT] |
-| -------------------------------------------- | ---------------------------------------- |
+| [**<= Materialized path operations**][MPops] | [**Next: Pseudo-Parameterized Views and Triggers =>][ParamViewTrigger] |
+| -------------------------------------------- | ---------------------------------------------------------------------- |
 
 
 <!-- References -->
 
 [MPops]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPops.md
-[SELECT]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopSELECT.md
+[ParamViewTrigger]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/ParamViewTrigger.md

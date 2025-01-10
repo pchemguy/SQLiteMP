@@ -453,11 +453,11 @@ A JSON object containing a complete set of records (`items`, `categories`, `item
 
 ---
 
-| [**<= Previous: SELECT Operations**][SELECT] | [**Next: Pseudo-Parameterized Views and Triggers =>**][ParamViewTrigger] |
-| -------------------------------------------- | ------------------------------------------------------------------------ |
+| [**<= Previous: SELECT Operations**][SELECT] | [**Next: DELETE Operations =>**][DELETE] |
+| -------------------------------------------- | ---------------------------------------- |
 
 <!-- References -->
 
 [SELECT]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopSELECT.md
-[ParamViewTrigger]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/ParamViewTrigger.md
+[DELETE]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopDELETE.md
 [ASCII ID generator]: https://pchemguy.github.io/SQLite-SQL-Tutorial/patterns/ascii-id
