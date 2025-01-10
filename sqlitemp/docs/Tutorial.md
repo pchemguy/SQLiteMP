@@ -16,7 +16,7 @@ This practical exercise involves the following steps:
    
 5. **Import Operation Modules**  
    Import the following modules in any order: `op_select.sql`, `op_create.sql`, `op_modify.sql`, `op_delete.sql`, and `op_export.sql`.  
-   The remaining files—`dummy_select.sql`, `dummy_create.sql`, `dummy_modify.sql`, `dummy_delete.sql`, and `dummy_export.sql`—contain demo data corresponding to the "Dummy Data" sections of their respective documentation pages.  
+   The remaining files - `dummy_select.sql`, `dummy_create.sql`, `dummy_modify.sql`, `dummy_delete.sql`, and `dummy_export.sql` - contain demo data corresponding to the "Dummy Data" sections of their respective documentation pages.  
    After completing this step, the database should contain:   
        - **4 non-system tables**
        - **2 indexes**
