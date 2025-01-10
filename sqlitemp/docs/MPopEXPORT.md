@@ -9,6 +9,7 @@ Each hierarchy operation may have an associated a view and trigger.
 | EXPORT                 | Categories                 | `exp_cat`                  | Given a set of categories, export paths for associated trees. If no categories are specified, export the entire tree. |
 | EXPORT                 | Leaf categories            | `exp_cat_leaf`             | Export leaf categories.                                                                                               |
 | EXPORT                 | Items                      | `exp_item`                 | Export items.                                                                                                         |
+| EXPORT                 | Item associations          | `exp_item_cat`             | Export item associations.                                                                                             |
 | EXPORT                 | Core data                  | `exp_core`                 | Export categories, items, an associations                                                                             |
 
 ---
@@ -153,6 +154,84 @@ WHEN NEW."op_name" = 'exp_item'
 BEGIN
     UPDATE hierarchy_ops SET payload = exp_item.payload
     FROM exp_item
+	WHERE id = NEW.id;
+END;
+```
+
+## Item associations - `exp_item_cat`
+
+Export item associations..
+
+### View
+
+```sql
+-- Prepares item data list
+DROP VIEW IF EXISTS "exp_item_cat";
+CREATE VIEW "exp_item_cat" AS
+SELECT cat_path, json_group_array(item_handle ORDER BY name) AS item_handles
+FROM items_categories, items
+WHERE item_handle = handle
+GROUP BY cat_path;
+```
+
+### Trigger
+
+```sql
+-- Export items
+DROP TRIGGER IF EXISTS "exp_item_cat";
+CREATE TRIGGER "exp_item_cat"
+AFTER INSERT ON "hierarchy_ops"
+FOR EACH ROW
+WHEN NEW."op_name" = 'exp_item_cat'
+BEGIN
+    UPDATE hierarchy_ops SET payload = data.payload
+    FROM (
+        SELECT
+            json_group_array(json_object(
+                'cat_path', cat_path,
+                'item_handlea', json(item_handles)
+            ) ORDER BY cat_path) AS payload
+        FROM exp_item_cat
+    ) AS data
+	WHERE id = NEW.id;
+END;
+```
+
+## Core data - `exp_core`
+
+Export categories, items, an associations
+
+### View
+
+```sql
+-- Prepares item data list
+DROP VIEW IF EXISTS "exp_item_cat";
+CREATE VIEW "exp_item_cat" AS
+SELECT cat_path, json_group_array(item_handle ORDER BY name) AS item_handles
+FROM items_categories, items
+WHERE item_handle = handle
+GROUP BY cat_path;
+```
+
+### Trigger
+
+```sql
+-- Export items
+DROP TRIGGER IF EXISTS "exp_item_cat";
+CREATE TRIGGER "exp_item_cat"
+AFTER INSERT ON "hierarchy_ops"
+FOR EACH ROW
+WHEN NEW."op_name" = 'exp_item_cat'
+BEGIN
+    UPDATE hierarchy_ops SET payload = data.payload
+    FROM (
+        SELECT
+            json_group_array(json_object(
+                'cat_path', cat_path,
+                'item_handlea', json(item_handles)
+            ) ORDER BY cat_path) AS payload
+        FROM exp_item_cat
+    ) AS data
 	WHERE id = NEW.id;
 END;
 ```
