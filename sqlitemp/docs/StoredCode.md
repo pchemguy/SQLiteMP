@@ -197,8 +197,8 @@ An additional advantage of this approach is that it ensures associated triggers 
 
 ---
 
-| [**<= Materialized path operations**][MPops] | [**Next: Pseudo-Parameterized Views and Triggers =>][ParamViewTrigger] |
-| -------------------------------------------- | ---------------------------------------------------------------------- |
+| [**<= Materialized path operations**][MPops] | [**Next: Pseudo-Parameterized Views and Triggers =>**][ParamViewTrigger] |
+| -------------------------------------------- | ------------------------------------------------------------------------ |
 
 
 <!-- References -->
