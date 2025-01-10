@@ -137,7 +137,9 @@ DROP VIEW IF EXISTS "exp_item";
 CREATE VIEW "exp_item" AS
 SELECT
 	json_group_array(json_object(
-		'name', name, 'handle_type', handle_type, 'handle', handle
+		'name', name,
+		'handle_type', handle_type,
+		'handle', handle
 	) ORDER BY name) AS payload
 FROM items;
 ```
@@ -204,34 +206,78 @@ Export categories, items, an associations
 ### View
 
 ```sql
--- Prepares item data list
-DROP VIEW IF EXISTS "exp_item_cat";
-CREATE VIEW "exp_item_cat" AS
-SELECT cat_path, json_group_array(item_handle ORDER BY name) AS item_handles
-FROM items_categories, items
-WHERE item_handle = handle
-GROUP BY cat_path;
+-- Prepares partially packed core data
+DROP VIEW IF EXISTS "exp_core";
+CREATE VIEW "exp_core" AS
+WITH
+    empty_cats AS (
+        SELECT c.path
+        FROM categories AS c
+        LEFT JOIN items_categories AS ic
+        ON c.path = ic.cat_path
+        WHERE ic.cat_path IS NULL
+        ORDER BY c.path
+    ),
+    unfiled_items AS (
+        SELECT
+            json_object(
+                'name', i.name,
+                'handle_type', i.handle_type,
+                'handle', i.handle
+            ) AS item_data
+        FROM items AS i
+        LEFT JOIN items_categories AS ic
+        ON i.handle = ic.item_handle
+        WHERE ic.item_handle IS NULL
+        ORDER BY i.name
+    ),
+    associated AS (
+        SELECT
+            c.path,
+            json_group_array(json_object(
+                'name', i.name,
+                'handle_type', i.handle_type,
+                'handle', i.handle
+            ) ORDER BY i.name) AS item_data
+        FROM categories AS c, items AS i, items_categories AS ic
+        WHERE (c.path, i.handle) = (ic.cat_path, ic.item_handle)
+        GROUP BY ic.cat_path
+        ORDER BY c.path
+    ),
+    package AS (
+        SELECT
+            json_object(
+                'empty_cats', (
+                    SELECT json_group_array(path ORDER BY path) FROM empty_cats
+                ),
+                'unfiled_items', (
+                    SELECT json_group_array(json(item_data) ORDER BY item_data) FROM unfiled_items
+                ),
+                'associated', (
+                    SELECT
+                        json_group_array(json_object(
+                            'path', path,
+                            'item_data', json(item_data)
+                        ) ORDER BY path)
+                    FROM associated
+                )
+            ) AS core_data
+    )
+SELECT * FROM package;
 ```
 
 ### Trigger
 
 ```sql
 -- Export items
-DROP TRIGGER IF EXISTS "exp_item_cat";
-CREATE TRIGGER "exp_item_cat"
+DROP TRIGGER IF EXISTS "exp_core";
+CREATE TRIGGER "exp_core"
 AFTER INSERT ON "hierarchy_ops"
 FOR EACH ROW
-WHEN NEW."op_name" = 'exp_item_cat'
+WHEN NEW."op_name" = 'exp_core'
 BEGIN
-    UPDATE hierarchy_ops SET payload = data.payload
-    FROM (
-        SELECT
-            json_group_array(json_object(
-                'cat_path', cat_path,
-                'item_handlea', json(item_handles)
-            ) ORDER BY cat_path) AS payload
-        FROM exp_item_cat
-    ) AS data
+    UPDATE hierarchy_ops SET payload = core_data
+    FROM exp_core
 	WHERE id = NEW.id;
 END;
 ```
