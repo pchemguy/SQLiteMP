@@ -20,7 +20,7 @@ CREATE TABLE "categories" (
                                 REFERENCES "categories"("path") ON DELETE CASCADE ON UPDATE CASCADE,
                             -- Used for housekeeping purposes
     "flag"          TEXT    COLLATE NOCASE,
-                            -- Used for housekeeping purposes
+                            -- Textual representation of the ID
     "ascii_id"      TEXT    NOT NULL UNIQUE COLLATE BINARY
                             GENERATED ALWAYS AS (
                                 char(
