@@ -16,7 +16,8 @@
 - **Structured and Maintainable Code**: Leverages ordinary and recursive common table expressions (CTEs) for clear and maintainable code.
 - **[Pseudo-Parameterized Views and Triggers][ParamViewTrigger]**: Implements parameterization through auxiliary buffer tables for added flexibility.
 - **Recursive Triggers for DRY Code**: Facilitates development of complex SQL logic (not yet implemented).
-- **Standard SQLite Compatibility**: Fully implemented using the standard SQLite library.
+- **Standard SQLite Compatibility**: Ensures portability and ease of use by relying on preinstalled binaries.
+- **[Step-by-Step Tutorial][]**: Offers a practical guide to setting up a demo database using the provided schema and dummy data modules.
 
 ---
 
@@ -56,3 +57,4 @@ See [docs][Overview] for further details.
 [MODIFY]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopMODIFY.md
 [CoreSchema]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/CoreSchema.md
 [StoredCode]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/StoredCode.md
+[Step-by-Step Tutorial]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Tutorial.md
