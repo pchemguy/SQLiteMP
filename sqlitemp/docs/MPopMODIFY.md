@@ -578,9 +578,3 @@ SELECT * FROM json_ops;
 [EXPORT]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopEXPORT.md
 [DELETE]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopDELETE.md
 [rec-cte]: https://pchemguy.github.io/SQLite-SQL-Tutorial/patterns/rec-cte
-
-
-
-
-
-

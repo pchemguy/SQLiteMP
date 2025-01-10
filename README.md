@@ -4,23 +4,19 @@
 
 ## **Features**
 
-- **Hierarchical Category Model**: Manages category systems with single-parent tree categories.
+- **[Hierarchical Category Model][CoreSchema]**: Manages category systems with single-parent tree categories.
 - **Flexible Item Association**: Associates items with multiple categories, enabling more versatile data organization.
 - **Referential Integrity**: Incorporates foreign keys to ensure consistency of the hierarchy structure and item association data.
 - **Cascading Foreign Keys**: Leverages cascading rules to streamline hierarchy management and ensure referential integrity.
 - **Conflict Resolution Clause**: Simplifies operations involving complex SQL logic (e.g., tree move or copy)
-- **Common Materialized Paths Operations**: Supports creation, deletion, movement, copying, importing, and exporting.
+- **[Common Materialized Paths Operations][MPops]**: Supports [creation][CREATE], [deletion][DELETE], [movement, copying][MODIFY], [importing][CREATE], and [exporting][EXPORT].
 - **JSON-Based API**: Offers a minimalistic SQL interface for seamless interaction.
-- **Encapsulated SQL Logic**: Improves modularity and reduces code coupling by embedding SQL logic within database views and triggers.
+- **[Encapsulated SQL Logic][StoredCode]**: Improves modularity and reduces code coupling by embedding SQL logic within database views and triggers.
 - **Simplified SQL Management**: Reduces the application's need to handle complex SQL code directly.
 - **Structured and Maintainable Code**: Leverages ordinary and recursive common table expressions (CTEs) for clear and maintainable code.
-- **Pseudo-Parameterized Views and Triggers**: Implements parameterization through auxiliary buffer tables for added flexibility.
+- **[Pseudo-Parameterized Views and Triggers][ParamViewTrigger]**: Implements parameterization through auxiliary buffer tables for added flexibility.
 - **Recursive Triggers for DRY Code**: Facilitates development of complex SQL logic (not yet implemented).
 - **Standard SQLite Compatibility**: Fully implemented using the standard SQLite library.
-
-- **Trigger-based SQL DRYing**: Turns parameterized views into reusable and testable SQL functions
-
-
 
 ---
 
@@ -52,3 +48,11 @@ See [docs][Overview] for further details.
 [MP]: https://pchemguy.github.io/SQLite-SQL-Tutorial/mat-paths
 [docs]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/
 [SQL]: https://github.com/pchemguy/SQLiteMP/tree/main/sqlitemp/src/sqlitemp/sql
+[MPops]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPops.md
+[ParamViewTrigger]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/ParamViewTrigger.md
+[CREATE]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopCREATE.md
+[EXPORT]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopEXPORT.md
+[DELETE]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopDELETE.md
+[MODIFY]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/MPopMODIFY.md
+[CoreSchema]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/CoreSchema.md
+[StoredCode]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/StoredCode.md
