@@ -8,7 +8,7 @@ Each hierarchy operation may have an associated a view and trigger.
 | ---------------------- | -------------------------- | -------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | EXPORT                 | Categories                 | `exp_cat`                  | Given a set of categories, export paths for associated trees. If no categories are specified, export the entire tree. |
 | EXPORT                 | Leaf categories            | `exp_cat_leaf`             | Export leaf categories.                                                                                               |
-| EXPORT                 | Items                      | `exp_item`                 | Given a set of categories and associated new paths, move subtrees and update related item associations.               |
+| EXPORT                 | Items                      | `exp_item`                 | Export items.                                                                                                         |
 | EXPORT                 | Item associations          | `exp_item_cat`             | Given a set of categories and associated new paths, copy subtrees and update related item associations.               |
 | EXPORT                 | All                        | `exp_all`                  |                                                                                                                       |
 
