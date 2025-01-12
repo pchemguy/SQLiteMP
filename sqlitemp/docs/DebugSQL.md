@@ -67,3 +67,28 @@ SELECT group_concat('SELECT * FROM ' || name || ';', x'0A') AS view_test
 FROM sqlite_master
 WHERE type = 'view';
 ```
+
+## Testing Triggers
+
+```sql
+SELECT
+   'DROP TABLE IF EXISTS "temp"."hierarchy_ops";
+    CREATE TEMP TABLE "hierarchy_ops" (
+        "id"        INTEGER PRIMARY KEY AUTOINCREMENT,
+        "op_name"   TEXT    NOT NULL COLLATE NOCASE,
+        "json_op"   TEXT    COLLATE NOCASE,
+        "payload"   TEXT
+    );' || x'0A0A' ||
+    group_concat(concat_ws(x'0A0A',
+        'DROP TRIGGER IF EXISTS temp."' || name || '";',
+        replace(
+            replace(sql, ' "' || tbl_name || '"', ' temp."' || tbl_name || '"'),
+            ' "' || name || '"',
+            ' temp."' || name || '"'
+        ) || ';',
+        'INSERT INTO temp."' || tbl_name || '"(op_name) VALUES (''dummy''); -- TRIGGER: ' || name,
+        'DROP TRIGGER IF EXISTS temp."' || name || '";'
+    ), x'0A0A') AS sql
+FROM main.sqlite_master
+WHERE type = 'trigger';
+```
