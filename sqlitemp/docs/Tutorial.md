@@ -1,4 +1,6 @@
-# **Tutorial**
+# Tutorial
+
+## Database Preparation
 
 This practical exercise involves the following steps:
 
@@ -35,6 +37,10 @@ This practical exercise involves the following steps:
    
 9. **Import `dummy_modify.sql` and `dummy_delete.sql`**  
    These modules add several rows to the `hierarchy_ops` table with the `payload` field set to `NULL`. The associated views will not provide useful information, so you should examine the affected data tables directly.
+
+## Debugging and Troubleshooting SQL
+
+
 
 ---
 
