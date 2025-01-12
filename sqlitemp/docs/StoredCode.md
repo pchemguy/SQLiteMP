@@ -182,7 +182,7 @@ The trigger code packs retrieved categories into a JSON string and sets the `pay
 
 ## Complex DML Operations via Triggers
 
-Trigger handler routines can include multiple `INSERT`, `UPDATE`, or `DELETE` statements, enabling the implementation of complex SQL logic that requires modifying multiple database tables (see [MODIFY][] operations). An alternative approach is to create a dedicated view and use it with [INSTEAD OF][] triggers in place of the `hierarchy_ops` table. While this approach does not allow the trigger handler to provide direct output as in the previous case, it can insert response data into a dedicated table if needed and still modify multiple tables to achieve the desired result.
+Trigger handler routines can include multiple `INSERT`, `UPDATE`, or `DELETE` statements, enabling the implementation of complex SQL logic that requires modifying multiple database tables (see [MODIFY][] operations). An alternative approach is to create a dedicated view and use it with [INSTEAD OF triggers][] in place of the `hierarchy_ops` table. While this approach does not allow the trigger handler to provide direct output as in the previous case, it can insert response data into a dedicated table if needed and still modify multiple tables to achieve the desired result.
 
 ## Summary
 
