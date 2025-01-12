@@ -34,4 +34,28 @@ SELECT * FROM engine_meta;
 ## Database Metadata
 
 ```sql
+WITH
+    tables          AS (SELECT name FROM sqlite_master WHERE type = 'table'
+                                                         AND name NOT LIKE 'sqlite_%'),
+    views           AS (SELECT name FROM sqlite_master WHERE type = 'view'),
+    triggers        AS (SELECT name FROM sqlite_master WHERE type = 'trigger'),
+    indexes         AS (SELECT name FROM sqlite_master WHERE type = 'index'
+                                                         AND name NOT LIKE 'sqlite_%'),
+    database_meta   AS (SELECT json_object(
+        'application_id',         (SELECT * FROM pragma_application_id()),
+        'user_version',           (SELECT * FROM pragma_user_version()),
+        'schema_version',         (SELECT * FROM pragma_schema_version()),
+        'journal_mode',           (SELECT * FROM pragma_journal_mode()),
+        'databases',              (SELECT json_group_array(json_object('name', name, 'file', file) ORDER BY seq)
+                                   FROM pragma_database_list()),
+        'tables_count',           (SELECT count(name) FROM tables),
+        'tables',                 (SELECT json_group_array(name ORDER BY name) FROM tables),
+        'views_count',            (SELECT count(name) FROM views),
+        'views',                  (SELECT json_group_array(name ORDER BY name) FROM views),
+        'triggers_count',         (SELECT count(name) FROM triggers),
+        'triggers',               (SELECT json_group_array(name ORDER BY name) FROM triggers),
+        'indexes_count',          (SELECT count(name) FROM indexes),
+        'indexes',                (SELECT json_group_array(name ORDER BY name) FROM indexes)
+    ) AS payload)
+SELECT * FROM database_meta;
 ```
