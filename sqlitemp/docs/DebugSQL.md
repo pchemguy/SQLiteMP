@@ -59,3 +59,11 @@ WITH
     ) AS payload)
 SELECT * FROM database_meta;
 ```
+
+## Testing Views
+
+```sql
+SELECT group_concat('SELECT * FROM ' || name || ';', x'0A') AS view_test
+FROM sqlite_master
+WHERE type = 'view';
+```
