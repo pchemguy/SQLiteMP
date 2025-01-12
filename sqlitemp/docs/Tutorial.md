@@ -40,7 +40,71 @@ This practical exercise involves the following steps:
 
 ## Debugging and Troubleshooting SQL
 
+A few preliminary notes on debugging and troubleshooting SQL code with SQLite. First of all, it is important to keep in mind that SQLite is a compact and embeddable engine - the entire SQLite engine fits within a single local library file a few MB large. At least on Windows, applications are usually shipped with their own copy of the library. This is a feature of SQLite, when used appropriately. But when one approaches SQLite with experience and intuition based on full-size client/server databases, this feature may cause confusion and result in apparently sporadic difficult to pinpoint issues. When I started figuring out how to use SQLite from Excel/VBA, I also used a couple SQLite administration tools, and it took me some time to realize, that each application used its own copy of the library. SQLite is renown for its long backward compatibility, but when it comes to using recent features, running the code in the course of development on several different versions of the library without clear understanding of this matter might be problematic. Furthermore, SQLite also has a flexible build system that makes it possible to not include unused features in custom builds to save space. Because of this, unless the official release is used by all applications of interest (which is most likely not the case), the library version number is not sufficient to understand which features are available. For these reasons, it is important to understand which particular copy of the library is used at any given time and which features are available. The most straightforward and reliable way to obtain this information is by executing introspection SQL queries on the database connection of interest. For example, the following query returns most of the engine related metadata provided by SQLite:
 
+```sql
+WITH
+    functions       AS (SELECT * FROM pragma_function_list()),
+    collations      AS (SELECT * FROM pragma_collation_list()),
+    compile_options AS (SELECT compile_options AS name
+                        FROM pragma_compile_options()),
+    modules         AS (SELECT * FROM pragma_module_list()),
+    pragmas         AS (SELECT * FROM pragma_pragma_list()),
+    engine_meta     AS (SELECT json_object(
+        'version',                 sqlite_version(),
+        'source_id',               sqlite_source_id(),
+        'functions_count',         (SELECT count(name) FROM (
+                                    SELECT name FROM functions GROUP BY name)),
+        'functions',               (SELECT
+                                        json_group_array(json_object(
+                                            'name', name, 'builtin', builtin, 'type', type,
+                                            'enc', enc, 'narg', narg, 'flags', flags
+                                        ) ORDER BY name, narg)
+                                FROM functions),
+        'collations_count',        (SELECT count(name) FROM collations),
+        'collations',              (SELECT json_group_array(name ORDER BY seq) FROM collations),
+        'modules_count',           (SELECT count(name) FROM modules),
+        'modules',                 (SELECT json_group_array(name ORDER BY name) FROM modules),
+        'pragmas_count',           (SELECT count(name) FROM pragmas),
+        'pragmas',                 (SELECT json_group_array(name ORDER BY name) FROM pragmas),
+        'compile_options_count',   (SELECT count(name) FROM compile_options),
+        'compile_options',         (SELECT json_group_array(name ORDER BY name) FROM compile_options)
+    ) AS payload)
+SELECT * FROM engine_meta;
+```
+
+SQLite also provides facilities to retrieve database related metadata, for example:
+
+```sql
+WITH
+    tables          AS (SELECT name FROM sqlite_master WHERE type = 'table'
+                                                         AND name NOT LIKE 'sqlite_%'),
+    views           AS (SELECT name FROM sqlite_master WHERE type = 'view'),
+    triggers        AS (SELECT name FROM sqlite_master WHERE type = 'trigger'),
+    indexes         AS (SELECT name FROM sqlite_master WHERE type = 'index'
+                                                         AND name NOT LIKE 'sqlite_%'),
+    database_meta   AS (SELECT json_object(
+        'application_id',         (SELECT * FROM pragma_application_id()),
+        'user_version',           (SELECT * FROM pragma_user_version()),
+        'schema_version',         (SELECT * FROM pragma_schema_version()),
+        'journal_mode',           (SELECT * FROM pragma_journal_mode()),
+        'databases',              (SELECT json_group_array(json_object('name', name, 'file', file) ORDER BY seq)
+                                   FROM pragma_database_list()),
+        'tables_count',           (SELECT count(name) FROM tables),
+        'tables',                 (SELECT json_group_array(name ORDER BY name) FROM tables),
+        'views_count',            (SELECT count(name) FROM views),
+        'views',                  (SELECT json_group_array(name ORDER BY name) FROM views),
+        'triggers_count',         (SELECT count(name) FROM triggers),
+        'triggers',               (SELECT json_group_array(name ORDER BY name) FROM triggers),
+        'indexes_count',          (SELECT count(name) FROM indexes),
+        'indexes',                (SELECT json_group_array(name ORDER BY name) FROM indexes)
+    ) AS payload)
+SELECT * FROM database_meta;
+```
+
+Because this project heavily relies on views and triggers, I wanted to talk about these object specifically. As it turns out, When a view or trigger is created, SQLite does not validate identifiers used. That means that a view or trigger code may include, for example, an invalid column reference, but the DDL statement would still succeed, but an error will be thrown later when attempting executing other queries. In such a case, tracing view/trigger bugs might be quite difficult, because the error messages may not be particularly helpful in such a situation.
+
+Views can be validated (for plain errors) relatively straightforwardly. The idea is that we want to reference each view in SQL statements one per statement and make sure that such statements can be executed without errors, For this test, it may make sense to drop all triggers, although this precaution might be excessive. The most simple approach is probably to select all rows from the view. The only issue is that doing this test for multiple views manually might be tedious.  
 
 ---
 
