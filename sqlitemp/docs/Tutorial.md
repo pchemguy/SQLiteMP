@@ -104,7 +104,43 @@ SELECT * FROM database_meta;
 
 Because this project heavily relies on views and triggers, I wanted to talk about these object specifically. As it turns out, When a view or trigger is created, SQLite does not validate identifiers used. That means that a view or trigger code may include, for example, an invalid column reference, but the DDL statement would still succeed, but an error will be thrown later when attempting executing other queries. In such a case, tracing view/trigger bugs might be quite difficult, because the error messages may not be particularly helpful in such a situation.
 
-Views can be validated (for plain errors) relatively straightforwardly. The idea is that we want to reference each view in SQL statements one per statement and make sure that such statements can be executed without errors, For this test, it may make sense to drop all triggers, although this precaution might be excessive. The most simple approach is probably to select all rows from the view. The only issue is that doing this test for multiple views manually might be tedious.  
+Views can be validated (for plain errors) relatively straightforwardly. The idea is that we want to reference each view in SQL statements one per statement and make sure that such statements can be executed without errors, For this test, it may make sense to drop all triggers, although this precaution might be excessive. The most simple approach is probably to select all rows from the view. The only issue is that doing this test for multiple views manually might be tedious. To simplify this process, the following query generates a full set of `SELECT` statements:
+
+```sql
+SELECT group_concat('SELECT * FROM ' || name || ';', x'0A') AS view_test
+FROM sqlite_master
+WHERE type = 'view';
+```
+
+When its output is executed in a modern GUI dba tool, the first defective view, if present will cause failure of the associated statement, revealing the problematic view. If this test passes, the next step is to check triggers.
+
+Triggers are trickier, however, because they cannot be executed directly. For the database, used in this tutorial, I have come up with the following code:
+
+```sql
+SELECT
+   'DROP TABLE IF EXISTS "temp"."hierarchy_ops";
+    CREATE TEMP TABLE "hierarchy_ops" (
+        "id"        INTEGER PRIMARY KEY AUTOINCREMENT,
+        "op_name"   TEXT    NOT NULL COLLATE NOCASE,
+        "json_op"   TEXT    COLLATE NOCASE,
+        "payload"   TEXT
+    );' || x'0A0A' ||
+    group_concat(concat_ws(x'0A0A',
+        'DROP TRIGGER IF EXISTS temp."' || name || '";',
+        replace(
+            replace(sql, ' "' || tbl_name || '"', ' temp."' || tbl_name || '"'),
+            ' "' || name || '"',
+            ' temp."' || name || '"'
+        ) || ';',
+        'INSERT INTO temp."' || tbl_name || '"(op_name) VALUES (''dummy''); -- TRIGGER: ' || name,
+        'DROP TRIGGER IF EXISTS temp."' || name || '";'
+    ), x'0A0A') || x'0A0A' ||
+    'DROP TABLE IF EXISTS "temp"."hierarchy_ops";' AS sql
+FROM main.sqlite_master
+WHERE type = 'trigger';
+```
+
+As before, the code generates SQL to be executed. The first generated query creates a twin of the `hierarchy_ops` table in the `temp` database. The rest of the code retrieves sql of all triggers, patches them with the `temp` database reference (in a fragile manner) and generates updated SQL for creating twin triggers in the `temp` database. After each trigger is created, an `INSERT` statement targeting the twin table is created. Only one trigger exists in the `temp` database at any given time. Thus, if any trigger is defective, the associated `INSERT` should fail, pointing out that view.
 
 ---
 
