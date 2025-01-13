@@ -18,7 +18,7 @@
 - **Recursive Triggers for DRY Code**: Facilitates development of complex SQL logic (not yet implemented).
 - **Standard SQLite Compatibility**: Ensures portability and ease of use by relying on preinstalled binaries.
 - **[Step-by-Step Tutorial][]**: Offers a practical guide to setting up a demo database using the provided schema and dummy data modules.
-- **[Debugging vies and triggers][Debug]**: Suggest approaches for robust semi-automated troubleshooting.
+- **[Debugging vies and triggers][Debug]**: Suggests approaches for robust semi-automated troubleshooting.
 
 ---
 
