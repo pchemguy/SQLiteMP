@@ -40,7 +40,32 @@ This practical exercise involves the following steps:
 
 ## Debugging and Troubleshooting SQL
 
-A few preliminary notes on debugging and troubleshooting SQL code with SQLite. First of all, it is important to keep in mind that SQLite is a compact and embeddable engine - the entire SQLite engine fits within a single local library file a few MB large. At least on Windows, applications are usually shipped with their own copy of the library. This is a feature of SQLite, when used appropriately. But when one approaches SQLite with experience and intuition based on full-size client/server databases, this feature may cause confusion and result in apparently sporadic difficult to pinpoint issues. When I started figuring out how to use SQLite from Excel/VBA, I also used a couple SQLite administration tools, and it took me some time to realize, that each application used its own copy of the library. SQLite is renown for its long backward compatibility, but when it comes to using recent features, running the code in the course of development on several different versions of the library without clear understanding of this matter might be problematic. Furthermore, SQLite also has a flexible build system that makes it possible to not include unused features in custom builds to save space. Because of this, unless the official release is used by all applications of interest (which is most likely not the case), the library version number is not sufficient to understand which features are available. For these reasons, it is important to understand which particular copy of the library is used at any given time and which features are available. The most straightforward and reliable way to obtain this information is by executing introspection SQL queries on the database connection of interest. For example, the following query returns most of the engine related metadata provided by SQLite:
+SQLite is a compact, embeddable database engine—its entire functionality resides within a single library file, typically just a few megabytes in size. While this design offers portability and simplicity, it introduces unique considerations for debugging and troubleshooting, especially for users accustomed to full-scale client/server databases.
+
+### Understanding SQLite's Compact Design
+
+1. **Local Library Copies**:  
+   Applications often ship with their own copy of the SQLite library. This flexibility is a core feature of SQLite but can lead to confusion:    
+    - Different applications may use different versions of the SQLite library.
+    - Without realizing this, you might inadvertently run code on several versions of SQLite, leading to inconsistent behavior or errors.
+2. **Backward Compatibility vs. Recent Features**:  
+    SQLite is renowned for its long-term backward compatibility. However:
+    - Using newer features can cause issues if an application relies on an older SQLite version.
+    - Relying on default assumptions about library versions can lead to sporadic, difficult-to-diagnose issues.
+3. **Custom Builds and Features**:  
+    SQLite's flexible build system allows developers to exclude unused features to save space.
+    - A library's version number alone does not guarantee feature availability.
+    - Features like JSON functions or advanced virtual table modules might be absent in some custom builds.
+
+### Best Practices for Debugging and Troubleshooting
+
+To avoid confusion and ensure consistent behavior, it is essential to determine:
+- Which SQLite library copy is being used by each application.
+- Which features are available in the current library build.
+
+### Using Introspection Queries
+
+The most reliable way to gather information about the SQLite engine in use is through introspection queries. For example, the following query returns key engine-related metadata:
 
 ```sql
 WITH
@@ -73,7 +98,7 @@ WITH
 SELECT * FROM engine_meta;
 ```
 
-SQLite also provides facilities to retrieve database related metadata, for example:
+Here’s how you might expand on SQLite's facilities for retrieving database-related metadata:
 
 ```sql
 WITH
@@ -102,19 +127,44 @@ WITH
 SELECT * FROM database_meta;
 ```
 
-Because this project heavily relies on views and triggers, I wanted to talk about these object specifically. As it turns out, When a view or trigger is created, SQLite does not validate identifiers used. That means that a view or trigger code may include, for example, an invalid column reference, but the DDL statement would still succeed, but an error will be thrown later when attempting executing other queries. In such a case, tracing view/trigger bugs might be quite difficult, because the error messages may not be particularly helpful in such a situation.
+### Validating Views and Triggers in SQLite
 
-Views can be validated (for plain errors) relatively straightforwardly. The idea is that we want to reference each view in SQL statements one per statement and make sure that such statements can be executed without errors, For this test, it may make sense to drop all triggers, although this precaution might be excessive. The most simple approach is probably to select all rows from the view. The only issue is that doing this test for multiple views manually might be tedious. To simplify this process, the following query generates a full set of `SELECT` statements:
+This project heavily relies on views and triggers, which introduces specific challenges in debugging and validation. SQLite allows creating views and triggers without validating all identifiers used within them at the time of creation. This means a view or trigger might include invalid column references or other errors, and the `CREATE` statement will still succeed. However, these errors will surface later when attempting to execute queries involving the faulty objects.
+
+#### Challenges with Views and Triggers
+
+1. **Deferred Error Detection**:  
+   Errors in views and triggers are detected only when the problematic object is invoked, making it harder to pinpoint the source of the issue.
+2. **Unhelpful Error Messages**:  
+   SQLite error messages in such cases might not clearly indicate the specific cause or location of the issue, complicating debugging.
+
+#### Validating Views
+
+To validate views for plain errors, the simplest method is to execute a basic query for each view. For example:
+```sql
+SELECT * FROM view_name LIMIT 1;
+```
+This ensures that the view is syntactically correct and all referenced identifiers are valid.
+
+##### Automating Validation
+
+Manually testing each view can be tedious in databases with many views. To simplify this process, you can generate a set of `SELECT` statements dynamically for all views in the database:
 
 ```sql
-SELECT group_concat('SELECT * FROM ' || name || ';', x'0A') AS view_test
-FROM sqlite_master
+SELECT 'SELECT * FROM "' || name || '" LIMIT 1;' AS validation_query
+FROM sqlite_schema
 WHERE type = 'view';
 ```
 
-When its output is executed in a modern GUI dba tool, the first defective view, if present will cause failure of the associated statement, revealing the problematic view. If this test passes, the next step is to check triggers.
+**Explanation**:
+- The query extracts the names of all views in the database from `sqlite_schema`.
+- For each view, it generates a corresponding `SELECT` statement to validate the view's structure.
 
-Triggers are trickier, however, because they cannot be executed directly. For the database, used in this tutorial, I have come up with the following code:
+Note, when testing views, consider temporarily dropping all triggers to prevent side effects or misleading error messages.  
+
+#### Validating Triggers
+
+Triggers are harder to validate automatically, as their code depends on specific events or operations (e.g., `INSERT`, `UPDATE`, or `DELETE`). Unlike views, they are not directly invoked through SQL queries. To mitigate potential issues, test tables may be created to trigger the events and confirm expected behavior. Then, triggers are created on the test tables one at a time, and the action is triggered. To ensure that the trigger was activated, its code may be appended with an `INSERT` statement that uses a temporary "log" table. For the database, used in this tutorial, I have come up with the following code:
 
 ```sql
 SELECT
@@ -140,7 +190,111 @@ FROM main.sqlite_master
 WHERE type = 'trigger';
 ```
 
-As before, the code generates SQL to be executed. The first generated query creates a twin of the `hierarchy_ops` table in the `temp` database. The rest of the code retrieves sql of all triggers, patches them with the `temp` database reference (in a fragile manner) and generates updated SQL for creating twin triggers in the `temp` database. After each trigger is created, an `INSERT` statement targeting the twin table is created. Only one trigger exists in the `temp` database at any given time. Thus, if any trigger is defective, the associated `INSERT` should fail, pointing out that view.
+The provided SQL code generates a single SQL script that can be used to test and debug triggers defined in the current SQLite database. Below is an explanation of how the query works, broken down step by step:
+
+##### Overview
+
+The goal of this script is to:
+1. Create a temporary table (`hierarchy_ops`): Acts as a dummy table for testing triggers.
+2. Duplicate triggers: Temporarily recreate triggers to operate on the temporary table instead of their original table.
+3. Test trigger execution: Insert dummy data into the temporary table to activate the recreated triggers.
+4. Clean up: Drop all the recreated triggers and the temporary table after testing.
+
+##### Code Breakdown
+###### 1. Create the Temporary Table
+```sql
+'DROP TABLE IF EXISTS "temp"."hierarchy_ops";
+ CREATE TEMP TABLE "hierarchy_ops" (
+     "id"        INTEGER PRIMARY KEY AUTOINCREMENT,
+     "op_name"   TEXT    NOT NULL COLLATE NOCASE,
+     "json_op"   TEXT    COLLATE NOCASE,
+     "payload"   TEXT
+ );' || x'0A0A' ||
+```
+- Purpose: The script begins by creating a temporary table (`temp.hierarchy_ops`) in the `temp` schema. This table mimics a table on which triggers might operate.
+- `DROP TABLE IF EXISTS`: Ensures the temporary table is removed if it already exists, avoiding conflicts.
+- Temporary Table (`TEMP TABLE`): Exists only for the duration of the database connection and is isolated from the permanent database.
+
+###### 2. Iterate Over Triggers
+```sql
+group_concat(concat_ws(x'0A0A',
+    'DROP TRIGGER IF EXISTS temp."' || name || '";',
+    replace(
+        replace(sql, ' "' || tbl_name || '"', ' temp."' || tbl_name || '"'),
+        ' "' || name || '"',
+        ' temp."' || name || '"'
+    ) || ';',
+    'INSERT INTO temp."' || tbl_name || '"(op_name) VALUES (''dummy''); -- TRIGGER: ' || name,
+    'DROP TRIGGER IF EXISTS temp."' || name || '";'
+), x'0A0A')
+```
+- Purpose: Processes all triggers in the database, modifying and testing them against the temporary table.
+- `group_concat`: Combines multiple SQL statements into one script, separated by the binary newline character (`x'0A0A'`).
+- `concat_ws`: Combines:
+  1. Drop the trigger if it exists: Ensures the trigger is recreated cleanly.
+```sql
+     'DROP TRIGGER IF EXISTS temp."' || name || '";'
+```
+
+  2. Modify the trigger SQL: Replaces references to the original table and trigger with references to the temporary table and recreated trigger.
+
+```sql
+     replace(
+         replace(sql, ' "' || tbl_name || '"', ' temp."' || tbl_name || '"'),
+         ' "' || name || '"',
+         ' temp."' || name || '"'
+     ) || ';'
+```
+     - `tbl_name`: The table on which the trigger operates.
+     - Replacements: Adjust references to tables and triggers to point to the `temp` schema.
+  3. Test the trigger: Inserts dummy data into the temporary table, which will activate the recreated trigger.
+
+```sql
+     'INSERT INTO temp."' || tbl_name || '"(op_name) VALUES (''dummy''); -- TRIGGER: ' || name
+```
+  
+  4. Clean up the recreated trigger: Drops the temporary trigger after testing.
+  
+```sql
+     'DROP TRIGGER IF EXISTS temp."' || name || '";'
+```
+
+###### 3. Clean Up the Temporary Table
+
+```sql
+|| x'0A0A' || 'DROP TABLE IF EXISTS "temp"."hierarchy_ops";' AS sql
+```
+
+- Purpose: Ensures the temporary table (`temp.hierarchy_ops`) is dropped at the end of the script to avoid leaving any residual data or schema.
+
+###### 4. Filter for Triggers
+
+```sql
+FROM main.sqlite_master
+WHERE type = 'trigger';
+```
+
+- Purpose: Filters the `sqlite_master` table for objects of type `trigger` in the `main` schema. This ensures that only triggers are processed.
+
+---
+
+##### How It Works
+
+1. Initial Setup: A temporary table (`temp.hierarchy_ops`) is created.
+2. Trigger Processing:
+   - For each trigger in the database:
+     1. A temporary version of the trigger is created, adjusted to operate on the temporary table.
+     2. Dummy data is inserted into the temporary table to activate the trigger.
+     3. The temporary trigger is dropped after execution.
+3. Final Cleanup: The temporary table is dropped after all triggers have been tested.
+
+---
+
+##### Purpose
+
+- Debugging Triggers: The script allows you to test triggers without modifying the original tables or schema.
+- Error Isolation: By isolating the triggers in a temporary schema, it becomes easier to identify and debug issues.
+- Automation: The use of dynamic SQL (`group_concat`, `replace`) ensures that the process adapts automatically to the triggers defined in the database.
 
 ---
 
