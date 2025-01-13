@@ -18,7 +18,7 @@
 - **Recursive Triggers for DRY Code**: Facilitates development of complex SQL logic (not yet implemented).
 - **Standard SQLite Compatibility**: Ensures portability and ease of use by relying on preinstalled binaries.
 - **[Step-by-Step Tutorial][]**: Offers a practical guide to setting up a demo database using the provided schema and dummy data modules.
-- **Debugging vies and triggers**: Suggest approaches for efficient semi-automated troubleshooting.
+- **[Debugging vies and triggers][Debug]**: Suggest approaches for efficient semi-automated troubleshooting.
 
 ---
 
@@ -59,3 +59,4 @@ See [docs][Overview] for further details.
 [CoreSchema]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/CoreSchema.md
 [StoredCode]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/StoredCode.md
 [Step-by-Step Tutorial]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Tutorial.md
+[Debug]: https://github.com/pchemguy/SQLiteMP/blob/main/sqlitemp/docs/Tutorial.md#debugging-and-troubleshooting-sql
