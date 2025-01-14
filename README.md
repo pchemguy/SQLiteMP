@@ -6,7 +6,7 @@
 
 - **[Hierarchical Category Model][CoreSchema]**: Manages category systems with single-parent tree categories.
 - **Flexible Item Association**: Associates items with multiple categories, enabling more versatile data organization.
-- **Referential Integrity**: Implements parent foreign keys using a generated column to ensure data consistency.
+- **Referential Integrity**: Establishes foreign keys using a generated `path` column to ensure data consistency.
 - **Cascading Foreign Keys**: Leverages cascading rules to streamline hierarchy management and ensure referential integrity.
 - **Conflict Resolution Clause**: Simplifies operations involving complex SQL logic (e.g., tree move or copy)
 - **[Common Materialized Paths Operations][MPops]**: Supports [creation][CREATE], [deletion][DELETE], [movement, copying][MODIFY], [importing][CREATE], and [exporting][EXPORT].
