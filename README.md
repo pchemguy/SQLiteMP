@@ -7,18 +7,18 @@
 - **[Hierarchical Category Model][CoreSchema]**: Manages category systems with single-parent tree categories.
 - **Flexible Item Association**: Associates items with multiple categories, enabling more versatile data organization.
 - **Referential Integrity**: Establishes foreign keys using a generated `path` column to ensure data consistency.
-- **Cascading Foreign Keys**: Leverages cascading rules to streamline hierarchy management and ensure referential integrity.
+- **Cascading Foreign Keys**: Applies cascading rules to streamline hierarchy management and ensure referential integrity.
 - **Conflict Resolution Clause**: Simplifies operations involving complex SQL logic (e.g., tree move or copy)
 - **[Common Materialized Paths Operations][MPops]**: Supports [creation][CREATE], [deletion][DELETE], [movement, copying][MODIFY], [importing][CREATE], and [exporting][EXPORT].
-- **JSON-Based API**: Offers a minimalistic SQL interface with JSON-based data input/output for seamless interaction.
+- **JSON-Based API**: Provides a minimalistic SQL interface with JSON-based data input/output for seamless interaction.
 - **[Encapsulated SQL Logic][StoredCode]**: Improves modularity and reduces code coupling by embedding SQL logic within database views and triggers.
 - **Simplified SQL Management**: Reduces the application's need to handle complex SQL code directly.
 - **Structured and Maintainable Code**: Leverages ordinary and recursive common table expressions (CTEs) for clear and maintainable code.
 - **[Pseudo-Parameterized Views and Triggers][ParamViewTrigger]**: Implements parameterization through auxiliary buffer tables for added flexibility.
 - **Recursive Triggers for DRY Code**: Facilitates development of complex SQL logic (not yet implemented).
 - **Standard SQLite Compatibility**: Ensures portability and ease of use by relying on preinstalled binaries.
-- **[Step-by-Step Tutorial][]**: Offers a practical guide to setting up a demo database using the provided schema and dummy data modules.
-- **[Debugging vies and triggers][Debug]**: Suggests approaches for robust semi-automated troubleshooting.
+- **[Step-by-Step Tutorial][]**: Provides a practical guide for setting up a demo database using the supplied schema and dummy data modules.
+- **[Debugging views and triggers][Debug]**: Discusses robust, semi-automated techniques for troubleshooting.
 
 ---
 
