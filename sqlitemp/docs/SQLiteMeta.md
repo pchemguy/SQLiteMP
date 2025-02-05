@@ -35,6 +35,5 @@ WITH
         GROUP BY src_table, fk_id
         ORDER BY src_table, dst_table
     )
-SELECT *
-FROM foreign_keys;
+SELECT * FROM foreign_keys;
 ```
