@@ -430,12 +430,35 @@ Overall, this updated prompt offers a more comprehensive and structured directiv
 ---
 ---
 
+# Additional refinement
+
+## Prompt
+
+Adjust project name: TableX
+
+Project description/context:
+
+The project aim is to help examine data stored in an SQLite database. The goal is to develop features involving
+- acceptance of the main table name;
+- introspection of the database structure;
+- identifying related tables based on foreign key information;
+- classifying identified relations as
+    - one-to-many
+    - many-to-many
+    - controlled dictionary fields
+        - the related table contains column "id" and a UNIQUE TEXT field "name"
+- generating appropriate CTE for each related table with the goal of including related table information along the fields of the main table
+
+
+---
+---
+
 # Final Version Used (from above)
 
 ### **Revised Prompt for ChatGPT: SQLiteMP Project Instructions**
 
 #### **Project Overview**
-- **Project Name:** **SQLiteMP**  
+- **Project Name:** **TableX**  
 - **Purpose:** Develop a Python package to provide functionality for working with SQLite databases.  
 - **Directory Structure:**  
   - `src/sqlitemp` — location for all source files  
