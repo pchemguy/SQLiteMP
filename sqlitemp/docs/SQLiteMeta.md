@@ -37,3 +37,6 @@ WITH
     )
 SELECT * FROM foreign_keys;
 ```
+
+## ChatGPT O3-mini-high Answer
+
